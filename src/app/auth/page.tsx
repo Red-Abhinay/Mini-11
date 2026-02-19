@@ -15,7 +15,7 @@ export default function AuthPage() {
   const [loginPassword, setLoginPassword] = useState("");
  
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(""); 
  
   const isValidEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
