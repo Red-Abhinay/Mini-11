@@ -1,50 +1,31 @@
 import { NextResponse } from "next/server";
-import { db } from "@/db";
-import { tasks } from "@/db/schema";
+import { db } from "../../../db";
+import { tasks } from "../../../db/schema";
 import { eq } from "drizzle-orm";
 
-export async function GET(req: Request) {
+export const dynamic = "force-dynamic";
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const projectId = searchParams.get("projectId");
+
   try {
-    const { searchParams } = new URL(req.url);
-    const projectId = Number(searchParams.get("projectId"));
+    const result = projectId
+      ? await db.select().from(tasks).where(eq(tasks.projectId, projectId))
+      : await db.select().from(tasks);
 
-    if (!projectId) {
-      return NextResponse.json({ error: "Project ID missing" }, { status: 400 });
-    }
+    const rows = result.map((row) => {
+      const sanitizedEntries = Object.entries(row).map(([key, value]) => {
+        if (typeof value === "bigint") return [key, value.toString()];
+        if (value instanceof Date) return [key, value.toISOString()];
+        return [key, value];
+      });
+      return Object.fromEntries(sanitizedEntries);
+    });
 
-    const data = await db
-      .select()
-      .from(tasks)
-      .where(eq(tasks.projectId, projectId));
-
-    return NextResponse.json(data);
-  } catch (err) {
-    console.error("GET tasks error:", err);
-    return NextResponse.json({ error: "Failed to fetch tasks" }, { status: 500 });
-  }
-}
-
-export async function POST(req: Request) {
-  try {
-    
-    const body = await req.json();
-
-    const inserted = await db
-      .insert(tasks)
-      .values({
-        title: body.title,
-        description: body.description,
-        assignedTo: body.assignedTo,
-        deadline: body.deadline,
-        priority: body.priority,
-        status: body.status || "Todo",
-        projectId: body.projectId,
-      })
-      .returning();
-
-    return NextResponse.json(inserted[0]);
-  } catch (err) {
-    console.error("POST task error:", err);
-    return NextResponse.json({ error: "Failed to create task" }, { status: 500 });
+    return NextResponse.json(rows);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ error: "Failed to fetch tasks", detail: message }, { status: 500 });
   }
 }
