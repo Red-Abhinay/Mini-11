@@ -1,13 +1,11 @@
-// src/app/dashboard/projects/[id]/page.tsx
 import { db } from "@/lib/db";
 import { projects, tasks } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 export default async function ProjectDetailsPage({ params }: { params: { id: string } }) {
-  const projectId = parseInt(params.id);
+  const projectId = params.id;
 
-  // SSR: Fetch project details and task stats in a single query
   const projectData = await db
     .select({
       id: projects.id,

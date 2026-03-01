@@ -9,6 +9,7 @@ export const tasks = pgTable("tasks", {
   status: varchar("status"),
   projectId: varchar("project_id"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export type Task = {
@@ -17,7 +18,8 @@ export type Task = {
   description?: string;
   status?: string;
   projectId?: string;
-  createdAt?: Date;
+  createdAt?: Date | null;
+  updatedAt: Date | null;
 };
 
 
