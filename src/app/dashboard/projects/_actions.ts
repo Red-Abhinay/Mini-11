@@ -33,3 +33,26 @@ export async function deleteProject(id: string) {
   await db.delete(projects).where(eq(projects.id, id));
   revalidatePath("/dashboard/projects"); 
 }
+
+export async function updateProject(id: string, formData: FormData) {
+  try {
+    const name = formData.get("name") as string;
+    const description = formData.get("description") as string;
+
+    await db.update(projects)
+      .set({ 
+        name, 
+        description, 
+        updatedAt: new Date() 
+      })
+      .where(eq(projects.id, id));
+
+    revalidatePath("/dashboard/projects");
+    
+    return { success: true, message: "Project updated successfully!" };
+    
+  } catch (e) {
+    console.error(e);
+    return { success: false, message: "Failed to update project." };
+  }
+}

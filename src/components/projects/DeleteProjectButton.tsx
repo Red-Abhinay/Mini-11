@@ -4,22 +4,35 @@ import { useState } from "react";
 import { Trash2, AlertTriangle } from "lucide-react";
 import { deleteProject } from "@/app/dashboard/projects/_actions";
 
-export function DeleteProjectButton({ projectId, projectName }: { projectId: string, projectName: string }) {
+export function DeleteProjectButton({ 
+  projectId, 
+  projectName,
+  onActionComplete
+}: { 
+  projectId: string, 
+  projectName: string,
+  onActionComplete?: () => void 
+}) {
   const [isConfirming, setIsConfirming] = useState(false);
 
   async function handleDelete() {
     await deleteProject(projectId);
     setIsConfirming(false);
+    if (onActionComplete) onActionComplete();
   }
 
   return (
     <>
       <button
-        onClick={() => setIsConfirming(true)}
-        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+        onClick={(e) => {
+          e.stopPropagation(); 
+          setIsConfirming(true);
+        }}
+        className="w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors" 
         title="Delete Project"
       >
-        <Trash2 size={16} />
+        <Trash2 size={14} /> 
+        <span>Delete Project</span>
       </button>
 
       {isConfirming && (
@@ -30,7 +43,7 @@ export function DeleteProjectButton({ projectId, projectName }: { projectId: str
               <h3 className="text-lg font-bold">Are you sure?</h3>
             </div>
             
-            <p className="text-slate-600 text-sm mb-6">
+            <p className="text-slate-600 text-sm mb-6 text-left">
               This will permanently delete <span className="font-semibold text-slate-900">"{projectName}"</span> and all its associated tasks. This action cannot be undone.
             </p>
 
@@ -45,7 +58,7 @@ export function DeleteProjectButton({ projectId, projectName }: { projectId: str
                 onClick={handleDelete}
                 className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors shadow-sm"
               >
-                Yes, Delete Project
+                Yes, Delete
               </button>
             </div>
           </div>
