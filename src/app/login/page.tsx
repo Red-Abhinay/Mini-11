@@ -88,7 +88,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="auth-page-wrapper">
+    <div className="auth-page-wrapper kanban-page">
       <div className={`cont${isSignup ? " s--signup" : ""}`}>
 
         {/* ── LOGIN FORM ── */}
