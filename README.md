@@ -34,3 +34,30 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Database & Drizzle ORM
+
+This project uses Drizzle ORM for TypeScript-first database access. To set up migrations and interact with the database locally:
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Ensure `DATABASE_URL` is set in your environment (e.g., in a `.env` file).
+
+3. Generate a migration (after editing `src/db/schema.ts`):
+
+```bash
+npm run drizzle:generate -- --name add-tasks
+```
+
+4. Apply migrations:
+
+```bash
+npm run drizzle:push
+```
+
+You can also invoke the `drizzle-kit` CLI directly with `npm run drizzle -- <command>`.
+
