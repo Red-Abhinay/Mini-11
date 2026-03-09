@@ -88,7 +88,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="auth-page-wrapper kanban-page">
+    <div className="auth-page-wrapper">
       <div className={`cont${isSignup ? " s--signup" : ""}`}>
 
         {/* ── LOGIN FORM ── */}
@@ -125,8 +125,6 @@ export default function AuthPage() {
               </button>
             </div>
           </label>
-
-          <span className="forgot-link">Forgot password?</span>
 
           {!isSignup && error && <p className="msg-error">{error}</p>}
           {!isSignup && successMsg && <p className="msg-success">{successMsg}</p>}

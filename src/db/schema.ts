@@ -1,4 +1,4 @@
-import { pgTable, text, varchar, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, uuid } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 
@@ -12,6 +12,17 @@ export const tasks = pgTable("tasks", {
     .notNull()
     .default("todo"),
   projectId: varchar("project_id").notNull(),
+  assignedTo:uuid("assigned_to"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  name: varchar("name", { length: 100 }).notNull(),
+  email: varchar("email", { length: 150 }).notNull().unique(),
+  password: text("password").notNull(),
+  role: varchar("role", { enum: ["manager", "employee"] }).notNull().default("employee"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -22,8 +33,10 @@ export type Task = {
   description?: string | null;
   status: "todo" | "in_progress" | "done";
   projectId: string;
+  assignedTo:string|null;
   createdAt?: Date;
   updatedAt?: Date;
+
 };
 
 export type CreateTaskInput = {
@@ -31,6 +44,7 @@ export type CreateTaskInput = {
   description?: string;
   status?: "todo" | "in_progress" | "done";
   projectId: string;
+  assignedTo?:string|null;
 };
 
 
