@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #ffffff;
@@ -19,6 +21,7 @@
   }
 }
 
+html,
 body {
   background: var(--background);
   color: var(--foreground);
