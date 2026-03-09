@@ -14,10 +14,9 @@ export async function POST(req: NextRequest) {
 
     const sql = neon(process.env.DATABASE_URL!);
 
-    const result = await sql(
-      "SELECT id, name, email, password, role FROM users WHERE email = $1",
-      [email.toLowerCase()]
-    );
+    const result = await sql`
+      SELECT id, name, email, password, role FROM users WHERE email = ${email.toLowerCase()}
+    `;
 
     if (result.length === 0) {
       return errorResponse("Invalid email or password.", 401);
@@ -25,15 +24,15 @@ export async function POST(req: NextRequest) {
 
     const user = result[0];
 
-    const isMatch = await comparePassword(password, user.password);
+    const isMatch = await comparePassword(password, user.password as string);
     if (!isMatch) {
       return errorResponse("Invalid email or password.", 401);
     }
 
     const token = signToken({
-      userId: user.id,
-      email: user.email,
-      role: user.role,
+      userId: user.id as string,
+      email: user.email as string,
+      role: user.role as "manager" | "employee",
     });
 
     await setAuthCookie(token);

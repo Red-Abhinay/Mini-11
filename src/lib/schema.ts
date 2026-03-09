@@ -1,8 +1,7 @@
 import {
   pgTable, uuid, varchar, text, timestamp, pgEnum,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
-import { relations } from "drizzle-orm";
+import { sql, relations } from "drizzle-orm";
 
 // Enums
 export const roleEnum = pgEnum("role", ["manager", "employee"]);
