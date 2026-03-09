@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import ManagerSidebar from "@/components/ManagerSidebar";
 
 interface Project {
   id: string;
@@ -127,16 +128,19 @@ export default function UserDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="flex min-h-screen bg-slate-50">
+        <ManagerSidebar />
+        <div className="flex-1 p-8">
         <div className="max-w-5xl mx-auto">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-            <div className="bg-white rounded-lg shadow p-6 space-y-4">
-              <div className="h-6 bg-gray-100 rounded w-3/4"></div>
-              <div className="h-6 bg-gray-100 rounded w-1/2"></div>
-              <div className="h-6 bg-gray-100 rounded w-2/3"></div>
+            <div className="h-8 bg-slate-200 rounded w-1/4 mb-6"></div>
+            <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
+              <div className="h-6 bg-slate-100 rounded w-3/4"></div>
+              <div className="h-6 bg-slate-100 rounded w-1/2"></div>
+              <div className="h-6 bg-slate-100 rounded w-2/3"></div>
             </div>
           </div>
+        </div>
         </div>
       </div>
     );
@@ -144,17 +148,20 @@ export default function UserDetailPage() {
 
   if (error || !user) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="flex min-h-screen bg-slate-50">
+        <ManagerSidebar />
+        <div className="flex-1 p-8">
         <div className="max-w-5xl mx-auto">
           <button
             onClick={() => router.push("/dashboard/users")}
-            className="mb-4 text-blue-600 hover:text-blue-800"
+            className="mb-4 text-slate-600 hover:text-slate-900 transition-colors"
           >
             ← Back to Users
           </button>
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
             {error || "User not found"}
           </div>
+        </div>
         </div>
       </div>
     );
@@ -163,27 +170,29 @@ export default function UserDetailPage() {
   const totalProjects = user.assignedProjects.length + user.managedProjects.length;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="flex min-h-screen bg-slate-50">
+      <ManagerSidebar />
+      <div className="flex-1 p-8">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-6 bg-white rounded-lg shadow-md p-6 sticky top-0 z-10">
           <button
             onClick={() => router.push("/dashboard/users")}
-            className="mb-4 text-blue-600 hover:text-blue-800 flex items-center"
+            className="mb-4 text-slate-600 hover:text-slate-900 transition-colors flex items-center"
           >
             ← Back to Users
           </button>
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{user.name}</h1>
-              <p className="text-gray-600 mt-1">{user.email}</p>
+              <h1 className="text-3xl font-bold text-slate-900">{user.name}</h1>
+              <p className="text-slate-600 mt-1">{user.email}</p>
             </div>
             <div className="flex gap-2">
               {!editMode ? (
                 <>
                   <button
                     onClick={() => setEditMode(true)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors"
                   >
                     Edit User
                   </button>
@@ -204,7 +213,7 @@ export default function UserDetailPage() {
                       role: user.role,
                     });
                   }}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                  className="px-4 py-2 bg-slate-300 text-slate-700 rounded-lg hover:bg-slate-400 transition-colors"
                 >
                   Cancel
                 </button>
@@ -214,12 +223,12 @@ export default function UserDetailPage() {
         </div>
 
         {/* User Info Card */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           {editMode ? (
             <form onSubmit={handleUpdate} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
                     Name
                   </label>
                   <input
@@ -228,12 +237,12 @@ export default function UserDetailPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
                     Email
                   </label>
                   <input
@@ -242,12 +251,12 @@ export default function UserDetailPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
                     Role
                   </label>
                   <select
@@ -258,7 +267,7 @@ export default function UserDetailPage() {
                         role: e.target.value as "manager" | "employee",
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
                   >
                     <option value="employee">Employee</option>
                     <option value="manager">Manager</option>
@@ -268,7 +277,7 @@ export default function UserDetailPage() {
               <div className="pt-4">
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  className="px-6 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors"
                 >
                   Save Changes
                 </button>
@@ -277,7 +286,7 @@ export default function UserDetailPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-1">Role</h3>
+                <h3 className="text-sm font-medium text-slate-500 mb-1">Role</h3>
                 <span
                   className={`px-3 py-1 inline-flex text-sm font-semibold rounded-full ${
                     user.role === "manager"
@@ -289,19 +298,19 @@ export default function UserDetailPage() {
                 </span>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-1">Total Projects</h3>
-                <p className="text-lg font-semibold text-gray-900">{totalProjects}</p>
+                <h3 className="text-sm font-medium text-slate-500 mb-1">Total Projects</h3>
+                <p className="text-lg font-semibold text-slate-900">{totalProjects}</p>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-1">Created At</h3>
-                <p className="text-gray-900">
+                <h3 className="text-sm font-medium text-slate-500 mb-1">Created At</h3>
+                <p className="text-slate-900">
                   {new Date(user.createdAt).toLocaleString()}
                 </p>
               </div>
               {user.updatedAt && (
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-1">Last Updated</h3>
-                  <p className="text-gray-900">
+                  <h3 className="text-sm font-medium text-slate-500 mb-1">Last Updated</h3>
+                  <p className="text-slate-900">
                     {new Date(user.updatedAt).toLocaleString()}
                   </p>
                 </div>
@@ -312,23 +321,23 @@ export default function UserDetailPage() {
 
         {/* Managed Projects */}
         {user.managedProjects.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 className="text-xl font-bold text-slate-900 mb-4">
               Managed Projects ({user.managedProjects.length})
             </h2>
             <div className="space-y-3">
               {user.managedProjects.map((project) => (
                 <div
                   key={project.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                  className="border border-slate-200 rounded-lg p-4 hover:bg-slate-50 transition-colors"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">{project.name}</h3>
+                      <h3 className="font-semibold text-slate-900">{project.name}</h3>
                       {project.description && (
-                        <p className="text-gray-600 text-sm mt-1">{project.description}</p>
+                        <p className="text-slate-600 text-sm mt-1">{project.description}</p>
                       )}
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="text-xs text-slate-500 mt-2">
                         Created: {new Date(project.createdAt).toLocaleDateString()}
                       </p>
                     </div>
@@ -338,7 +347,7 @@ export default function UserDetailPage() {
                           ? "bg-green-100 text-green-800"
                           : project.status === "completed"
                           ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-100 text-gray-800"
+                          : "bg-slate-100 text-slate-800"
                       }`}
                     >
                       {project.status}
@@ -352,23 +361,23 @@ export default function UserDetailPage() {
 
         {/* Assigned Projects */}
         {user.assignedProjects.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold text-slate-900 mb-4">
               Assigned Projects ({user.assignedProjects.length})
             </h2>
             <div className="space-y-3">
               {user.assignedProjects.map((project) => (
                 <div
                   key={project.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                  className="border border-slate-200 rounded-lg p-4 hover:bg-slate-50 transition-colors"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">{project.name}</h3>
+                      <h3 className="font-semibold text-slate-900">{project.name}</h3>
                       {project.description && (
-                        <p className="text-gray-600 text-sm mt-1">{project.description}</p>
+                        <p className="text-slate-600 text-sm mt-1">{project.description}</p>
                       )}
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="text-xs text-slate-500 mt-2">
                         Created: {new Date(project.createdAt).toLocaleDateString()}
                       </p>
                     </div>
@@ -378,7 +387,7 @@ export default function UserDetailPage() {
                           ? "bg-green-100 text-green-800"
                           : project.status === "completed"
                           ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-100 text-gray-800"
+                          : "bg-slate-100 text-slate-800"
                       }`}
                     >
                       {project.status}
@@ -392,12 +401,13 @@ export default function UserDetailPage() {
 
         {/* No Projects */}
         {totalProjects === 0 && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-center text-gray-500">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <p className="text-center text-slate-500">
               This user is not assigned to any projects yet.
             </p>
           </div>
         )}
+      </div>
       </div>
     </div>
   );
