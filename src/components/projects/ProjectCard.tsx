@@ -57,7 +57,6 @@ export function ProjectCard({ project, progress = 0 }: ProjectCardProps) {
                     <DeleteProjectButton 
                       projectId={project.id} 
                       projectName={project.name} 
-                      variant="menuItem" 
                       onActionComplete={() => setIsMenuOpen(false)}
                     />
                   </div>

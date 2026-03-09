@@ -5,10 +5,9 @@ import { and, eq } from "drizzle-orm";
 
 export async function GET(
   req: Request,
-  { params }: { params: { projectId: string; taskId: string } }
+  { params }: { params: Promise<{ projectId: string; taskId: string }> }
 ) {
-  const projectId = Number(params.projectId);
-  const taskId = Number(params.taskId);
+  const { projectId, taskId } = await params;
 
   const result = await db
     .select()
@@ -24,9 +23,9 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  { params }: { params: { projectId: string; taskId: string } }
+  { params }: { params: Promise<{ projectId: string; taskId: string }> }
 ) {
-  const taskId = Number(params.taskId);
+  const { taskId } = await params;
   const body = await req.json();
 
   await db
@@ -34,9 +33,7 @@ export async function PUT(
     .set({
       title: body.title,
       description: body.description,
-      assignedTo: body.assignedTo,
-      deadline: body.deadline,
-      priority: body.priority,
+      status: body.status,
     })
     .where(eq(tasks.id, taskId));
 
@@ -45,9 +42,9 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { projectId: string; taskId: string } }
+  { params }: { params: Promise<{ projectId: string; taskId: string }> }
 ) {
-  const taskId = Number(params.taskId);
+  const { taskId } = await params;
 
   await db.delete(tasks).where(eq(tasks.id, taskId));
 
