@@ -2,11 +2,13 @@
 
 .auth-page-wrapper {
   min-height: 100vh;
-  background: #f0f0f0;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  color: #f4f6f8;
+  background: radial-gradient(1200px 600px at 10% -10%, #ffddb2 0%, #ffddb200 60%), radial-gradient(900px 600px at 100% 0, #b7e4ff 0%, #b7e4ff00 60%), #0f1216;
+    
 }
 
 .cont {
@@ -21,6 +23,9 @@
     10px 10px 15px rgba(70,70,70,0.15),
     inset -10px -10px 15px rgba(255,255,255,0.3),
     inset 10px 10px 15px rgba(70,70,70,0.15);
+    
+    
+
 }
 
 .form {
@@ -111,7 +116,7 @@
   z-index: 2;
   position: relative;
   width: 120px;
-  height: 36px;
+  height: 39px;
   margin: 0 auto;
   background: transparent;
   color: #fff;
