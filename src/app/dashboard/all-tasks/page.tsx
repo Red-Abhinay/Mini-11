@@ -13,7 +13,7 @@ const STATUS_CONFIG: Record<Status, { label: string; badge: string; dot: string;
   done:        { label: "Done",        badge: "text-green-400 bg-green-400/10 border-green-400/25", dot: "bg-green-400",  ring: "border-green-400", bg: "bg-green-400/10" },
 };
 
-// ─── Update Task Modal ────────────────────────────────────────────────────────
+
 
 function UpdateTaskModal({ task, onClose, onUpdated }: { task: Task; onClose: () => void; onUpdated: (t: Task) => void }) {
   const [status, setStatus] = useState<Status>(task.status as Status);
@@ -77,7 +77,7 @@ function UpdateTaskModal({ task, onClose, onUpdated }: { task: Task; onClose: ()
   );
 }
 
-// ─── Delete Confirm Modal ─────────────────────────────────────────────────────
+
 
 function DeleteConfirmModal({ task, onClose, onDeleted }: { task: Task; onClose: () => void; onDeleted: (id: string) => void }) {
   const [loading, setLoading] = useState(false);
@@ -115,7 +115,7 @@ function DeleteConfirmModal({ task, onClose, onDeleted }: { task: Task; onClose:
   );
 }
 
-// ─── Task Row ─────────────────────────────────────────────────────────────────
+
 
 function TaskRow({ task, onUpdated, onDeleted }: { task: Task; onUpdated: (t: Task) => void; onDeleted: (id: string) => void }) {
   const [showUpdate, setShowUpdate] = useState(false);
@@ -155,7 +155,7 @@ function TaskRow({ task, onUpdated, onDeleted }: { task: Task; onUpdated: (t: Ta
   );
 }
 
-// ─── Project Group ────────────────────────────────────────────────────────────
+
 
 function ProjectGroup({ projectId, tasks, onUpdated, onDeleted, onOpenProject }: {
   projectId: string; tasks: Task[];
@@ -215,7 +215,7 @@ function ProjectGroup({ projectId, tasks, onUpdated, onDeleted, onOpenProject }:
   );
 }
 
-// ─── Stat Card ────────────────────────────────────────────────────────────────
+
 
 function StatCard({ label, value, valueClass }: { label: string; value: number; valueClass: string }) {
   return (
@@ -226,7 +226,6 @@ function StatCard({ label, value, valueClass }: { label: string; value: number; 
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function AllTasksPage() {
   const router = useRouter();

@@ -12,7 +12,6 @@ const STATUS_CONFIG: Record<Status, { label: string; badge: string; dot: string;
   done:        { label: "Done",        badge: "text-green-400 bg-green-400/10 border-green-400/25",  dot: "bg-green-400",  border: "border-slate-600",  ring: "border-green-400" },
 };
 
-// ─── Update Task Modal ────────────────────────────────────────────────────────
 
 function UpdateTaskModal({ task, onClose, onUpdated }: {
   task: Task; onClose: () => void; onUpdated: (t: Task) => void;
@@ -100,7 +99,6 @@ function UpdateTaskModal({ task, onClose, onUpdated }: {
   );
 }
 
-// ─── Delete Confirm Modal ─────────────────────────────────────────────────────
 
 function DeleteConfirmModal({ task, onClose, onDeleted }: {
   task: Task; onClose: () => void; onDeleted: (id: string) => void;
@@ -155,7 +153,6 @@ function DeleteConfirmModal({ task, onClose, onDeleted }: {
   );
 }
 
-// ─── Task Card ────────────────────────────────────────────────────────────────
 
 function TaskCard({ task, onUpdated, onDeleted }: {
   task: Task; onUpdated: (t: Task) => void; onDeleted: (id: string) => void;
@@ -211,7 +208,6 @@ function TaskCard({ task, onUpdated, onDeleted }: {
   );
 }
 
-// ─── Create Task Modal ────────────────────────────────────────────────────────
 
 function CreateTaskModal({ projectId, onClose, onCreated }: {
   projectId: string; onClose: () => void; onCreated: (task: Task) => void;
@@ -302,7 +298,6 @@ function CreateTaskModal({ projectId, onClose, onCreated }: {
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function TasksPage() {
   const { projectId } = useParams<{ projectId: string }>();

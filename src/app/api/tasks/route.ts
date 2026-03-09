@@ -3,7 +3,7 @@ import { tasks } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
-// GET /api/tasks?projectId=xxx
+
 export async function GET(req: NextRequest) {
   try {
     const projectId = req.nextUrl.searchParams.get("projectId");
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST /api/tasks
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// PATCH /api/tasks/[taskId] — update status
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ taskId: string }> }
@@ -97,7 +97,7 @@ export async function PATCH(
   }
 }
 
-// DELETE /api/tasks/[taskId] — delete task
+
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ taskId: string }> }

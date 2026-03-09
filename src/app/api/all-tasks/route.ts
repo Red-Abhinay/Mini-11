@@ -2,7 +2,6 @@ import { db } from "@/lib/db";
 import { tasks } from "@/db/schema";
 import { NextResponse } from "next/server";
 
-// GET /api/all-tasks
 export async function GET() {
   try {
     const result = await db
