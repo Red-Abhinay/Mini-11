@@ -19,6 +19,7 @@ export interface ApiTask {
   id: string;
   title: string;
   description?: string | null;
-  status: TaskStatus;
-  project_id: string;
+  status: string;
+  project_id?: string;
+  projectId?: string;
 }

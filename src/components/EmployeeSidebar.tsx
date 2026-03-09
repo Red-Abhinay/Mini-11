@@ -10,14 +10,11 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  { label: "Home", href: "/dashboard/manager", icon: "🏠" },
-  { label: "Analytics Dashboard", href: "/dashboard/analytics", icon: "📊" },
-  { label: "Projects", href: "/dashboard/projects", icon: "➕" },
-  { label: "Manage Users", href: "/dashboard/users", icon: "👥" },
-  { label: "Manage Tasks", href: "/dashboard/all-tasks", icon: "🗂️" },
+  { label: "Home", href: "/dashboard/employee", icon: "🏠" },
+  { label: "Kanban", href: "/dashboard/kanban", icon: "📋" },
 ];
 
-export default function ManagerSidebar() {
+export default function EmployeeSidebar() {
   const pathname = usePathname();
 
   return (

@@ -12,7 +12,7 @@ export const tasks = pgTable("tasks", {
     .notNull()
     .default("todo"),
   projectId: varchar("project_id").notNull(),
-  assignedTo:uuid("assigned_to"),
+  assignedTo: varchar("assigned_to"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   DndContext,
   DragEndEvent,
@@ -28,6 +29,11 @@ const normalizeStatus = (status: string): TaskStatus => {
     .toLowerCase()
     .replace(/_/g, "-")
     .replace(/\s+/g, "-");
+
+  if (normalized === "todo") return "assigned";
+  if (normalized === "in-progress") return "in-progress";
+  if (normalized === "done") return "completed";
+
   const match = columns.find((column) => column.id === normalized);
   return match ? match.id : "assigned";
 };
@@ -37,7 +43,7 @@ const mapApiTask = (task: ApiTask): Task => ({
   title: task.title,
   description: task.description,
   status: normalizeStatus(task.status),
-  projectId: task.project_id,
+  projectId: task.project_id || task.projectId || "",
 });
 
 const groupTasks = (tasks: Task[]): TasksByStatus =>
@@ -90,11 +96,17 @@ const moveTaskToStatus = (
 };
 
 const KanbanPage = () => {
+  const searchParams = useSearchParams();
+  const initialProjectId = searchParams.get("projectId") || "all";
   const [tasks, setTasks] = useState<Task[]>([]);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
-  const [projectFilter, setProjectFilter] = useState<string>("all");
+  const [projectFilter, setProjectFilter] = useState<string>(initialProjectId);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setProjectFilter(initialProjectId);
+  }, [initialProjectId]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),

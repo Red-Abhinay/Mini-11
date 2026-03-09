@@ -70,19 +70,35 @@ export async function PATCH(
   try {
     const { taskId } = await params;
     const body = await req.json();
-    const { status } = body;
+    const { status, assigned_to } = body;
 
     if (!taskId) {
       return NextResponse.json({ error: "taskId is required" }, { status: 400 });
     }
 
-    if (!["todo", "in_progress", "done"].includes(status)) {
+    if (status !== undefined && !["todo", "in_progress", "done"].includes(status)) {
       return NextResponse.json({ error: "Invalid status value" }, { status: 400 });
+    }
+
+    if (assigned_to !== undefined && assigned_to !== null && typeof assigned_to !== "string") {
+      return NextResponse.json({ error: "Invalid assigned_to value" }, { status: 400 });
+    }
+
+    const updatePayload: { status?: string; assignedTo?: string | null; updatedAt: Date } = {
+      updatedAt: new Date(),
+    };
+
+    if (status !== undefined) {
+      updatePayload.status = status;
+    }
+
+    if (assigned_to !== undefined) {
+      updatePayload.assignedTo = assigned_to;
     }
 
     const [updated] = await db
       .update(tasks)
-      .set({ status, updatedAt: new Date() })
+      .set(updatePayload)
       .where(eq(tasks.id, taskId))
       .returning();
 

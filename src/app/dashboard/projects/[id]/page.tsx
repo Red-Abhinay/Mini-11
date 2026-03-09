@@ -20,10 +20,58 @@ interface ProjectData {
   status: string | null;
 }
 
+interface AssignableUser {
+  id: string;
+  name: string;
+  email: string;
+  role: "manager" | "employee";
+}
+
 function CreateTaskModal({ projectId, onClose, onCreated }: { projectId: string; onClose: () => void; onCreated: (task: Task) => void }) {
   const [form, setForm] = useState({ title: "", description: "" });
+  const [employees, setEmployees] = useState<AssignableUser[]>([]);
+  const [employeesLoading, setEmployeesLoading] = useState(true);
+  const [assigneeSearch, setAssigneeSearch] = useState("");
+  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const res = await fetch("/api/users");
+        if (!res.ok) {
+          throw new Error("Failed to load employees");
+        }
+
+        const users: AssignableUser[] = await res.json();
+        setEmployees(users.filter((user) => user.role === "employee"));
+      } catch {
+        setError("Failed to load employees");
+      } finally {
+        setEmployeesLoading(false);
+      }
+    };
+
+    loadUsers();
+  }, []);
+
+  const filteredEmployees = employees.filter((employee) => {
+    const search = assigneeSearch.trim().toLowerCase();
+    if (!search) return true;
+    return (
+      employee.name.toLowerCase().includes(search) ||
+      employee.email.toLowerCase().includes(search)
+    );
+  });
+
+  const toggleEmployee = (employeeId: string) => {
+    setSelectedEmployeeIds((prev) =>
+      prev.includes(employeeId)
+        ? prev.filter((id) => id !== employeeId)
+        : [...prev, employeeId]
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,28 +80,42 @@ function CreateTaskModal({ projectId, onClose, onCreated }: { projectId: string;
       return;
     }
 
+    if (selectedEmployeeIds.length === 0) {
+      setError("Select at least one employee to assign this task");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/tasks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: form.title,
-          description: form.description,
-          projectId,
-          status: "todo",
-        }),
-      });
+      // The tasks table stores one assignee per row, so create one task per selected employee.
+      const createResults = await Promise.all(
+        selectedEmployeeIds.map(async (employeeId) => {
+          const res = await fetch("/api/tasks", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              title: form.title,
+              description: form.description,
+              projectId,
+              status: "todo",
+              assigned_to: employeeId,
+            }),
+          });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to create task");
-      }
+          if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.error || "Failed to create task");
+          }
 
-      const newTask = await res.json();
+          return res.json() as Promise<Task>;
+        })
+      );
+
       setForm({ title: "", description: "" });
-      onCreated(newTask);
+      setAssigneeSearch("");
+      setSelectedEmployeeIds([]);
+      createResults.forEach((task) => onCreated(task));
       onClose();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -96,6 +158,49 @@ function CreateTaskModal({ projectId, onClose, onCreated }: { projectId: string;
             />
           </div>
 
+          <div className="mb-6">
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Assign</label>
+            <div className="rounded-lg border border-slate-700 bg-slate-900/50 p-3">
+              <input
+                type="text"
+                placeholder="Search employee name"
+                value={assigneeSearch}
+                onChange={(e) => setAssigneeSearch(e.target.value)}
+                disabled={loading || employeesLoading}
+                className="mb-3 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none transition-colors focus:border-indigo-500 disabled:opacity-50"
+              />
+
+              <div className="max-h-40 space-y-2 overflow-y-auto pr-1">
+                {employeesLoading && (
+                  <p className="text-sm text-slate-400">Loading employees...</p>
+                )}
+
+                {!employeesLoading && filteredEmployees.length === 0 && (
+                  <p className="text-sm text-slate-400">No employees found.</p>
+                )}
+
+                {!employeesLoading && filteredEmployees.map((employee) => (
+                  <label
+                    key={employee.id}
+                    className="flex cursor-pointer items-start gap-2 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm hover:border-slate-500"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedEmployeeIds.includes(employee.id)}
+                      onChange={() => toggleEmployee(employee.id)}
+                      disabled={loading}
+                      className="mt-0.5 h-4 w-4"
+                    />
+                    <span className="leading-tight text-slate-200">
+                      {employee.name}
+                      <span className="block text-xs text-slate-400">{employee.email}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
           <div className="flex gap-3">
             <button
               type="button"
@@ -119,22 +224,110 @@ function CreateTaskModal({ projectId, onClose, onCreated }: { projectId: string;
   );
 }
 
-function UpdateTaskModal({ task, onClose, onUpdated }: { task: Task; onClose: () => void; onUpdated: (t: Task) => void }) {
+function UpdateTaskModal({ task, onClose, onUpdated, onCreated }: { task: Task; onClose: () => void; onUpdated: (t: Task) => void; onCreated: (t: Task) => void }) {
   const [status, setStatus] = useState<Status>(task.status as Status);
+  const [employees, setEmployees] = useState<AssignableUser[]>([]);
+  const [employeesLoading, setEmployeesLoading] = useState(true);
+  const [assigneeSearch, setAssigneeSearch] = useState("");
+  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const res = await fetch("/api/users");
+        if (!res.ok) {
+          throw new Error("Failed to load employees");
+        }
+
+        const users: AssignableUser[] = await res.json();
+        setEmployees(
+          users.filter(
+            (user) => user.role === "employee" && user.id !== task.assignedTo
+          )
+        );
+      } catch {
+        setError("Failed to load employees");
+      } finally {
+        setEmployeesLoading(false);
+      }
+    };
+
+    loadUsers();
+  }, []);
+
+  const filteredEmployees = employees.filter((employee) => {
+    const search = assigneeSearch.trim().toLowerCase();
+    if (!search) return true;
+    return (
+      employee.name.toLowerCase().includes(search) ||
+      employee.email.toLowerCase().includes(search)
+    );
+  });
+
+  const toggleEmployee = (employeeId: string) => {
+    setSelectedEmployeeIds((prev) =>
+      prev.includes(employeeId)
+        ? prev.filter((id) => id !== employeeId)
+        : [...prev, employeeId]
+    );
+  };
+
+  const canSave = status !== task.status || selectedEmployeeIds.length > 0;
+
   const handleUpdate = async () => {
-    if (status === task.status) { onClose(); return; }
     setLoading(true); setError(null);
     try {
-      const res = await fetch(`/api/tasks/${task.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-      if (!res.ok) { const d = await res.json(); throw new Error(d.error || "Failed"); }
-      onUpdated(await res.json()); onClose();
+      const statusChanged = status !== task.status;
+      const hasNewAssignees = selectedEmployeeIds.length > 0;
+
+      if (!statusChanged && !hasNewAssignees) {
+        onClose();
+        return;
+      }
+
+      if (statusChanged) {
+        const res = await fetch(`/api/tasks/${task.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        });
+        if (!res.ok) { const d = await res.json(); throw new Error(d.error || "Failed"); }
+
+        const updatedTask = await res.json();
+        onUpdated(updatedTask);
+      }
+
+      // One task row stores one assignee, so added assignees are created as additional task rows.
+      if (hasNewAssignees) {
+        const createdTasks = await Promise.all(
+          selectedEmployeeIds.map(async (employeeId) => {
+            const createRes = await fetch("/api/tasks", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                title: task.title,
+                description: task.description,
+                projectId: task.projectId,
+                status: statusChanged ? status : task.status,
+                assigned_to: employeeId,
+              }),
+            });
+
+            if (!createRes.ok) {
+              const d = await createRes.json();
+              throw new Error(d.error || "Failed to add employee to task");
+            }
+
+            return createRes.json() as Promise<Task>;
+          })
+        );
+
+        createdTasks.forEach((createdTask) => onCreated(createdTask));
+      }
+
+      onClose();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally { setLoading(false); }
@@ -169,9 +362,52 @@ function UpdateTaskModal({ task, onClose, onUpdated }: { task: Task; onClose: ()
           ))}
         </div>
 
+        <div className="mb-6">
+          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Assign</label>
+          <div className="rounded-lg border border-slate-700 bg-slate-900/50 p-3">
+            <input
+              type="text"
+              placeholder="Search employee name"
+              value={assigneeSearch}
+              onChange={(e) => setAssigneeSearch(e.target.value)}
+              disabled={loading || employeesLoading}
+              className="mb-3 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none transition-colors focus:border-indigo-500 disabled:opacity-50"
+            />
+
+            <div className="max-h-40 space-y-2 overflow-y-auto pr-1">
+              {employeesLoading && (
+                <p className="text-sm text-slate-400">Loading employees...</p>
+              )}
+
+              {!employeesLoading && filteredEmployees.length === 0 && (
+                <p className="text-sm text-slate-400">No employees found.</p>
+              )}
+
+              {!employeesLoading && filteredEmployees.map((employee) => (
+                <label
+                  key={employee.id}
+                  className="flex cursor-pointer items-start gap-2 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm hover:border-slate-500"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedEmployeeIds.includes(employee.id)}
+                    onChange={() => toggleEmployee(employee.id)}
+                    disabled={loading}
+                    className="mt-0.5 h-4 w-4"
+                  />
+                  <span className="leading-tight text-slate-200">
+                    {employee.name}
+                    <span className="block text-xs text-slate-400">{employee.email}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+
         <div className="flex gap-3">
           <button onClick={onClose} className="px-4 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-400 text-sm font-medium cursor-pointer hover:border-slate-500 transition-colors">Cancel</button>
-          <button onClick={handleUpdate} disabled={loading || status === task.status}
+          <button onClick={handleUpdate} disabled={loading || !canSave}
             className="flex-1 px-4 py-2.5 rounded-lg bg-indigo-500 text-white text-sm font-semibold cursor-pointer hover:bg-indigo-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             {loading ? "Saving…" : "Save Changes"}
           </button>
@@ -217,19 +453,23 @@ function DeleteConfirmModal({ task, onClose, onDeleted }: { task: Task; onClose:
   );
 }
 
-function TaskRow({ task, onUpdated, onDeleted }: { task: Task; onUpdated: (t: Task) => void; onDeleted: (id: string) => void }) {
+function TaskRow({ task, onUpdated, onDeleted, onCreated, assigneeName }: { task: Task; onUpdated: (t: Task) => void; onDeleted: (id: string) => void; onCreated: (t: Task) => void; assigneeName: string }) {
   const [showUpdate, setShowUpdate] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const cfg = STATUS_CONFIG[task.status as Status] ?? STATUS_CONFIG.todo;
 
   return (
     <>
-      <div className="grid grid-cols-[1fr_130px_210px] items-center px-6 py-4 hover:bg-slate-700/50 transition-colors duration-150 gap-3">
+      <div className="grid grid-cols-[1fr_220px_130px_210px] items-center px-6 py-4 hover:bg-slate-700/50 transition-colors duration-150 gap-3">
         <div>
           <p className="font-semibold text-sm text-slate-100">{task.title}</p>
           {task.description && (
             <p className="text-xs text-slate-400 mt-1 truncate max-w-xs">{task.description}</p>
           )}
+        </div>
+
+        <div className="text-sm text-slate-300 truncate" title={assigneeName}>
+          {assigneeName}
         </div>
 
         <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border w-fit ${cfg.badge}`}>
@@ -249,7 +489,7 @@ function TaskRow({ task, onUpdated, onDeleted }: { task: Task; onUpdated: (t: Ta
         </div>
       </div>
 
-      {showUpdate && <UpdateTaskModal task={task} onClose={() => setShowUpdate(false)} onUpdated={onUpdated} />}
+      {showUpdate && <UpdateTaskModal task={task} onClose={() => setShowUpdate(false)} onUpdated={onUpdated} onCreated={onCreated} />}
       {showDelete && <DeleteConfirmModal task={task} onClose={() => setShowDelete(false)} onDeleted={onDeleted} />}
     </>
   );
@@ -271,6 +511,7 @@ export default function ProjectDetailsPage() {
 
   const [project, setProject] = useState<ProjectData | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [usersById, setUsersById] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterStatus>("all");
@@ -296,6 +537,25 @@ export default function ProjectDetailsPage() {
   useEffect(() => {
     fetchProjectAndTasks();
   }, [fetchProjectAndTasks]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch("/api/users");
+        if (!res.ok) return;
+        const users: AssignableUser[] = await res.json();
+        const mapped = users.reduce<Record<string, string>>((acc, user) => {
+          acc[user.id] = user.name;
+          return acc;
+        }, {});
+        setUsersById(mapped);
+      } catch {
+        // Keep task list usable even if users endpoint fails.
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const handleUpdated = (updated: Task) =>
     setTasks(prev => prev.map(t => t.id === updated.id ? updated : t));
@@ -387,14 +647,22 @@ export default function ProjectDetailsPage() {
               </div>
             ) : (
               <div className="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-lg">
-                <div className="grid grid-cols-[1fr_130px_210px] px-6 py-4 bg-slate-900 border-b border-slate-700 gap-3">
+                <div className="grid grid-cols-[1fr_220px_130px_210px] px-6 py-4 bg-slate-900 border-b border-slate-700 gap-3">
                   <span className="text-xs text-slate-400 uppercase tracking-widest font-semibold">Task</span>
+                  <span className="text-xs text-slate-400 uppercase tracking-widest font-semibold">Assigned To</span>
                   <span className="text-xs text-slate-400 uppercase tracking-widest font-semibold">Status</span>
                   <span className="text-xs text-slate-400 uppercase tracking-widest font-semibold text-right">Actions</span>
                 </div>
                 <div className="divide-y divide-slate-700">
                   {filtered.map(task => (
-                    <TaskRow key={task.id} task={task} onUpdated={handleUpdated} onDeleted={handleDeleted} />
+                    <TaskRow
+                      key={task.id}
+                      task={task}
+                      onUpdated={handleUpdated}
+                      onDeleted={handleDeleted}
+                      onCreated={handleCreated}
+                      assigneeName={task.assignedTo ? (usersById[task.assignedTo] || task.assignedTo) : "Unassigned"}
+                    />
                   ))}
                 </div>
               </div>
