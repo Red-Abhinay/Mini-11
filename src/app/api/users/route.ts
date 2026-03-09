@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { getAllUsers, getUsersWithProjects } from "@/services/user.service";
@@ -41,4 +42,27 @@ export async function GET(req: NextRequest) {
       { status: 500 }
     );
   }
+=======
+import { db } from "@/lib/db";  
+import { users } from "@/db/schema";
+import { NextResponse } from "next/server";
+
+export async function GET(){
+    try{
+        const allUsers = await db.select({
+            id:users.id,
+            name:users.name,
+            email:users.email,
+
+        })
+        .from(users)
+        .orderBy(users.name);
+        return NextResponse.json(allUsers,{status:200});
+    }
+    catch(error){
+        console.error("[GET /api/users]",error);
+    
+    return NextResponse.json({error:"Internal server error"},{status:500});
+    }
+>>>>>>> 321bf86 (Added user assignment task)
 }

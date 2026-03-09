@@ -126,8 +126,6 @@ export default function AuthPage() {
             </div>
           </label>
 
-          <span className="forgot-link">Forgot password?</span>
-
           {!isSignup && error && <p className="msg-error">{error}</p>}
           {!isSignup && successMsg && <p className="msg-success">{successMsg}</p>}
 

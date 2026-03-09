@@ -42,15 +42,15 @@ export function CreateProjectModal() {
     <>
       <button 
         onClick={() => setIsOpen(true)}
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+        className="create-project-btn"
       >
         + New Project
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white text-gray-900 p-6 rounded-xl w-96 shadow-xl">
-            <h2 className="text-xl font-bold mb-4">Create New Project</h2>
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2 className="modal-title">Create New Project</h2>
             
             <form action={handleSubmit}>
               <input 
@@ -58,28 +58,28 @@ export function CreateProjectModal() {
                 placeholder="Project Name" 
                 required 
                 disabled={isPending}
-                className="w-full border p-2 rounded mb-3 disabled:bg-gray-100"
+                className="modal-input"
               />
               <textarea 
                 name="description" 
                 placeholder="Description" 
                 required 
                 disabled={isPending}
-                className="w-full border p-2 rounded mb-4 resize-none h-32 disabled:bg-gray-100"
+                className="modal-textarea"
               />
-              <div className="flex justify-end gap-2">
+              <div className="modal-actions">
                 <button 
                   type="button" 
                   onClick={() => setIsOpen(false)} 
                   disabled={isPending}
-                  className="px-4 py-2 hover:bg-gray-100 rounded"
+                  className="modal-cancel-btn"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
                   disabled={isPending}
-                  className="bg-blue-600 text-white px-4 py-2 rounded disabled:bg-blue-400 flex items-center gap-2"
+                  className="modal-submit-btn"
                 >
                   {isPending ? "Creating..." : "Create"}
                 </button>
