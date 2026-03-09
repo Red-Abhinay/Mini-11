@@ -160,10 +160,28 @@ const KanbanPage = () => {
   }, [tasks]);
 
   const updateTaskStatus = async (taskId: string, status: TaskStatus) => {
-    const response = await fetch("/api/update-task-status", {
-      method: "POST",
+    // Map UI status values to DB status enums
+    const mapStatusToDb = (s: TaskStatus) => {
+      switch (s) {
+        case "assigned":
+          return "todo";
+        case "in-progress":
+          return "in_progress";
+        case "completed":
+          return "done";
+        case "reviewed":
+          return "done";
+        default:
+          return "todo";
+      }
+    };
+
+    const dbStatus = mapStatusToDb(status);
+
+    const response = await fetch(`/api/tasks/${taskId}`, {
+      method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: taskId, status }),
+      body: JSON.stringify({ status: dbStatus }),
     });
 
     if (!response.ok) {
