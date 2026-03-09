@@ -10,4 +10,3 @@ const sql = postgres(process.env.DATABASE_URL, { ssl: { rejectUnauthorized: fals
 export const db = drizzle(sql);
 
 export default db;
-
