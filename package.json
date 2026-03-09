@@ -9,7 +9,10 @@
     "lint": "eslint",
     "drizzle:generate": "drizzle-kit generate:migration",
     "drizzle:push": "drizzle-kit push",
-    "drizzle": "drizzle-kit"
+    "drizzle": "drizzle-kit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -17,6 +20,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@neondatabase/serverless": "^1.0.2",
     "axios": "^1.13.5",
+    "autoprefixer": "^10.4.24",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.6.1",
     "drizzle-orm": "^0.45.1",
@@ -31,6 +35,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hot-toast": "^2.6.0",
+    "tailwindcss": "^4",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
@@ -46,7 +51,6 @@
     "drizzle-kit": "^0.31.9",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
-    "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"
   }
