@@ -7,7 +7,6 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
   try {
     const projectId = req.nextUrl.searchParams.get("projectId");
-<<<<<<< HEAD
 
     // If a projectId is provided, filter by it. Otherwise return all tasks.
     let result;
@@ -21,22 +20,6 @@ export async function GET(req: NextRequest) {
       result = await db.select().from(tasks).orderBy(tasks.createdAt);
     }
 
-=======
- 
-    if (!projectId) {
-      return NextResponse.json(
-        { error: "projectId query param is required" },
-        { status: 400 }
-      );
-    }
- 
-    const result = await db
-      .select()
-      .from(tasks)
-      .where(eq(tasks.projectId, projectId))
-      .orderBy(tasks.createdAt);
- 
->>>>>>> 321bf86 (Added user assignment task)
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
     console.error("[GET /api/tasks]", error);

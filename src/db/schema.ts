@@ -1,4 +1,4 @@
-import { pgTable, text, varchar, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, uuid } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 
@@ -44,7 +44,7 @@ export type CreateTaskInput = {
   description?: string;
   status?: "todo" | "in_progress" | "done";
   projectId: string;
-<<<<<<< HEAD
+  assignedTo?:string|null;
 };
 
 
@@ -88,7 +88,3 @@ export const tasksRelations = relations(tasks, ({ one }) => ({
     references: [projects.id],
   }),
 }));
-=======
-  assignedTo?:string|null;
-};
->>>>>>> 321bf86 (Added user assignment task)

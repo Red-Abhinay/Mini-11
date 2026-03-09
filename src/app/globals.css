@@ -232,14 +232,7 @@ body {
 
 
 
-<<<<<<< HEAD
-html,
-body {
-  min-height: 100vh;
-  font-family: "Open Sans", Helvetica, Arial, sans-serif;
-  background: #f0f0f0;
-}
-=======
+
 /* ────────────────────────────────────────────────────────────────── */
 /* PROJECTS PAGE & CARDS */
 /* ────────────────────────────────────────────────────────────────── */
@@ -768,4 +761,3 @@ body {
   color: #ffb4b4;
   box-shadow: 0 0 16px rgba(255, 107, 107, 0.2);
 }
->>>>>>> origin/dev
