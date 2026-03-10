@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import type { Task } from "@/db/schema";
+import ManagerSidebar from "@/components/ManagerSidebar";
 
 type Status = "todo" | "in_progress" | "done";
 type FilterStatus = Status | "all";
@@ -143,7 +144,7 @@ function CreateTaskModal({ projectId, onClose, onCreated }: { projectId: string;
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               disabled={loading}
-              className="w-full px-4 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 text-sm outline-none focus:border-indigo-500 transition-colors disabled:opacity-50"
+              className="w-full px-4 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 text-sm outline-none focus:border-sky-300 transition-colors disabled:opacity-50"
             />
           </div>
 
@@ -154,7 +155,7 @@ function CreateTaskModal({ projectId, onClose, onCreated }: { projectId: string;
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               disabled={loading}
-              className="w-full px-4 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 text-sm outline-none focus:border-indigo-500 transition-colors disabled:opacity-50 resize-none h-24"
+              className="w-full px-4 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-100 text-sm outline-none focus:border-sky-300 transition-colors disabled:opacity-50 resize-none h-24"
             />
           </div>
 
@@ -167,7 +168,7 @@ function CreateTaskModal({ projectId, onClose, onCreated }: { projectId: string;
                 value={assigneeSearch}
                 onChange={(e) => setAssigneeSearch(e.target.value)}
                 disabled={loading || employeesLoading}
-                className="mb-3 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none transition-colors focus:border-indigo-500 disabled:opacity-50"
+                className="mb-3 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none transition-colors focus:border-sky-300 disabled:opacity-50"
               />
 
               <div className="max-h-40 space-y-2 overflow-y-auto pr-1">
@@ -213,7 +214,7 @@ function CreateTaskModal({ projectId, onClose, onCreated }: { projectId: string;
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2.5 rounded-lg bg-indigo-500 text-white text-sm font-semibold cursor-pointer hover:bg-indigo-400 transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2.5 rounded-lg bg-sky-400/20 border border-sky-300/50 text-sky-100 text-sm font-semibold cursor-pointer hover:bg-sky-300/30 transition-colors disabled:opacity-50"
             >
               {loading ? "Creating…" : "Create Task"}
             </button>
@@ -371,7 +372,7 @@ function UpdateTaskModal({ task, onClose, onUpdated, onCreated }: { task: Task; 
               value={assigneeSearch}
               onChange={(e) => setAssigneeSearch(e.target.value)}
               disabled={loading || employeesLoading}
-              className="mb-3 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none transition-colors focus:border-indigo-500 disabled:opacity-50"
+              className="mb-3 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none transition-colors focus:border-sky-300 disabled:opacity-50"
             />
 
             <div className="max-h-40 space-y-2 overflow-y-auto pr-1">
@@ -408,7 +409,7 @@ function UpdateTaskModal({ task, onClose, onUpdated, onCreated }: { task: Task; 
         <div className="flex gap-3">
           <button onClick={onClose} className="px-4 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-400 text-sm font-medium cursor-pointer hover:border-slate-500 transition-colors">Cancel</button>
           <button onClick={handleUpdate} disabled={loading || !canSave}
-            className="flex-1 px-4 py-2.5 rounded-lg bg-indigo-500 text-white text-sm font-semibold cursor-pointer hover:bg-indigo-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            className="flex-1 px-4 py-2.5 rounded-lg bg-sky-400/20 border border-sky-300/50 text-sky-100 text-sm font-semibold cursor-pointer hover:bg-sky-300/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             {loading ? "Saving…" : "Save Changes"}
           </button>
         </div>
@@ -479,7 +480,7 @@ function TaskRow({ task, onUpdated, onDeleted, onCreated, assigneeName }: { task
 
         <div className="flex gap-2 justify-end">
           <button onClick={() => setShowUpdate(true)}
-            className="px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-semibold cursor-pointer hover:bg-indigo-500/20 hover:border-indigo-500/50 transition-all duration-150">
+            className="px-3 py-1.5 rounded-lg bg-sky-300/10 border border-sky-300/35 text-sky-200 text-xs font-semibold cursor-pointer hover:bg-sky-300/20 hover:border-sky-300/55 transition-all duration-150">
             Update
           </button>
           <button onClick={() => setShowDelete(true)}
@@ -580,38 +581,42 @@ export default function ProjectDetailsPage() {
   };
 
   return (
-    <div className="kanban-page">
-      <div className="kanban-shell">
-        <header className="kanban-header">
-          <div>
-            <p className="kanban-eyebrow">Project Details</p>
-            <h1>{project?.name || "Project"}</h1>
-            <p className="kanban-subtitle">
-              {project?.description || "Manage all tasks in this project"}
-            </p>
-          </div>
-          <div className="kanban-controls">
-            <button 
-              onClick={() => setShowCreateTask(true)}
-              className="create-project-btn"
-            >
-              + New Task
-            </button>
-            <button 
-              onClick={() => router.back()}
-              className="create-project-btn"
-            >
-              ← Back
-            </button>
-          </div>
-        </header>
+    <div className="flex min-h-screen flex-col md:flex-row">
+      <ManagerSidebar />
 
-        {error && <div className="kanban-alert">{error}</div>}
+      <main className="flex flex-1 flex-col">
+        <div className="kanban-page">
+          <div className="kanban-shell">
+            <header className="kanban-header">
+              <div>
+                <p className="kanban-eyebrow">Project Details</p>
+                <h1>{project?.name || "Project"}</h1>
+                <p className="kanban-subtitle">
+                  {project?.description || "Manage all tasks in this project"}
+                </p>
+              </div>
+              <div className="kanban-controls">
+                <button 
+                  onClick={() => setShowCreateTask(true)}
+                  className="create-project-btn"
+                >
+                  + New Task
+                </button>
+                <button 
+                  onClick={() => router.back()}
+                  className="create-project-btn"
+                >
+                  ← Back
+                </button>
+              </div>
+            </header>
 
-        {loading ? (
-          <div className="kanban-loading">Loading tasks…</div>
-        ) : (
-          <>
+          {error && <div className="kanban-alert">{error}</div>}
+
+            {loading ? (
+              <div className="kanban-loading">Loading tasks…</div>
+            ) : (
+              <>
             {/* Stat cards */}
             <div className="flex gap-3 mb-8 flex-wrap">
               <StatCard label="Total"       value={counts.all}         valueClass="text-slate-50" />
@@ -626,13 +631,13 @@ export default function ProjectDetailsPage() {
                 placeholder="Search tasks…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="bg-slate-800 border border-slate-700 rounded-lg text-slate-100 text-sm px-4 py-2.5 outline-none focus:border-indigo-500 transition-colors flex-1 min-w-[200px]"
+                className="bg-slate-800 border border-slate-700 rounded-lg text-slate-100 text-sm px-4 py-2.5 outline-none focus:border-sky-300 transition-colors flex-1 min-w-[200px]"
               />
               {(["all", "todo", "in_progress", "done"] as const).map(f => (
                 <button key={f} onClick={() => setFilter(f)}
                   className={`px-4 py-1.5 rounded-full border text-xs font-medium cursor-pointer transition-all
                     ${filter === f
-                      ? "border-indigo-500 bg-indigo-500/15 text-indigo-400"
+                      ? "border-sky-300/60 bg-sky-300/15 text-sky-200"
                       : "border-slate-700 bg-transparent text-slate-500 hover:border-slate-600"}`}
                 >
                   {f === "all" ? "All" : STATUS_CONFIG[f as Status].label}
@@ -667,17 +672,19 @@ export default function ProjectDetailsPage() {
                 </div>
               </div>
             )}
-          </>
-        )}
-      </div>
+              </>
+            )}
+          </div>
 
-      {showCreateTask && (
-        <CreateTaskModal
-          projectId={projectId}
-          onClose={() => setShowCreateTask(false)}
-          onCreated={handleCreated}
-        />
-      )}
+          {showCreateTask && (
+            <CreateTaskModal
+              projectId={projectId}
+              onClose={() => setShowCreateTask(false)}
+              onCreated={handleCreated}
+            />
+          )}
+        </div>
+      </main>
     </div>
   );
 }

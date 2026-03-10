@@ -34,6 +34,7 @@ export default async function ProjectsPage() {
     session.email.split("@")[0].replace(/\./g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 
   const progressByProject = new Map<string, number>();
+  const statusByProject = new Map<string, "planning" | "in_progress" | "completed">();
   if (allProjects.length > 0) {
     const projectIds = allProjects.map((project) => project.id);
     const projectTasks = await db
@@ -41,23 +42,44 @@ export default async function ProjectsPage() {
       .from(tasks)
       .where(inArray(tasks.projectId, projectIds));
 
-    const taskStats = new Map<string, { total: number; done: number }>();
+    const taskStats = new Map<
+      string,
+      { total: number; done: number; inProgress: number }
+    >();
     for (const projectId of projectIds) {
-      taskStats.set(projectId, { total: 0, done: 0 });
+      taskStats.set(projectId, { total: 0, done: 0, inProgress: 0 });
     }
 
     for (const task of projectTasks) {
-      const current = taskStats.get(task.projectId) || { total: 0, done: 0 };
+      const current = taskStats.get(task.projectId) || { total: 0, done: 0, inProgress: 0 };
       current.total += 1;
       if (task.status === "done") {
         current.done += 1;
+      }
+      if (task.status === "in_progress") {
+        current.inProgress += 1;
       }
       taskStats.set(task.projectId, current);
     }
 
     for (const [projectId, stats] of taskStats.entries()) {
-      const completion = stats.total > 0 ? Math.round((stats.done / stats.total) * 100) : 0;
+      // Count in-progress tasks as partial completion so active projects don't look stuck at 0%.
+      const completion =
+        stats.total > 0
+          ? Math.round(((stats.done + stats.inProgress * 0.5) / stats.total) * 100)
+          : 0;
       progressByProject.set(projectId, completion);
+
+      const derivedStatus: "planning" | "in_progress" | "completed" =
+        stats.total === 0
+          ? "planning"
+          : stats.done === stats.total
+          ? "completed"
+          : stats.inProgress > 0 || stats.done > 0
+          ? "in_progress"
+          : "planning";
+
+      statusByProject.set(projectId, derivedStatus);
     }
   }
 
@@ -90,7 +112,7 @@ export default async function ProjectsPage() {
                 {allProjects.map((project: Project) => (
                   <ProjectCard
                     key={project.id}
-                    project={project}
+                    project={{ ...project, status: statusByProject.get(project.id) ?? project.status }}
                     managerName={managerName}
                     progress={progressByProject.get(project.id) ?? 0}
                   />

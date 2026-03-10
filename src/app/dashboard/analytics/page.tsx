@@ -46,20 +46,20 @@ interface Stats {
 }
 
 const COLORS = {
-  primary: ['#3b82f6', '#60a5fa', '#93c5fd', '#dbeafe'],
+  primary: ['#5f9fb8', '#d9c2a4', '#77aec4', '#e6d6c2'],
   status: {
-    active: '#10b981',
-    completed: '#3b82f6',
-    archived: '#6b7280',
-    todo: '#f59e0b',
-    in_progress: '#3b82f6',
-    review: '#8b5cf6',
-    done: '#10b981',
+    active: '#5f9fb8',
+    completed: '#d9c2a4',
+    archived: '#7a8797',
+    todo: '#cbb39a',
+    in_progress: '#6ea9c1',
+    review: '#bca88f',
+    done: '#7db5cb',
   },
   priority: {
-    low: '#10b981',
-    medium: '#f59e0b',
-    high: '#ef4444',
+    low: '#6ea9c1',
+    medium: '#d9c2a4',
+    high: '#bfa690',
   }
 };
 
@@ -151,7 +151,7 @@ export default function AnalyticsDashboard() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-300 mx-auto"></div>
           <p className="mt-4 text-slate-600">Loading analytics...</p>
         </div>
       </div>
@@ -238,7 +238,7 @@ export default function AnalyticsDashboard() {
                 <p className="text-3xl font-bold text-slate-900 mt-2">{stats.summary.totalUsers}</p>
                 <p className="text-xs text-slate-600 mt-1">Active in system</p>
               </div>
-              <div className="analytics-kpi-icon text-cyan-300">
+              <div className="analytics-kpi-icon text-slate-600">
                 <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
                   <circle cx="9" cy="8" r="3" stroke="currentColor" strokeWidth="1.8" />
                   <path d="M3.5 19C3.5 15.96 5.96 13.5 9 13.5C12.04 13.5 14.5 15.96 14.5 19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
@@ -256,7 +256,7 @@ export default function AnalyticsDashboard() {
                 <p className="text-3xl font-bold text-slate-900 mt-2">{stats.summary.totalProjects}</p>
                 <p className="text-xs text-slate-600 mt-1">Across organization</p>
               </div>
-              <div className="analytics-kpi-icon text-emerald-300">
+              <div className="analytics-kpi-icon text-sky-200">
                 <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
                   <path d="M3 7A2 2 0 0 1 5 5H9L11 7H19A2 2 0 0 1 21 9V17A2 2 0 0 1 19 19H5A2 2 0 0 1 3 17V7Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -271,7 +271,7 @@ export default function AnalyticsDashboard() {
                 <p className="text-3xl font-bold text-slate-900 mt-2">{stats.summary.totalTasks}</p>
                 <p className="text-xs text-slate-600 mt-1">{completionRate}% completed</p>
               </div>
-              <div className="analytics-kpi-icon text-violet-300">
+              <div className="analytics-kpi-icon text-sky-200">
                 <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
                   <path d="M5 13L9.5 17.5L19 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -311,12 +311,12 @@ export default function AnalyticsDashboard() {
             <h3 className="text-lg font-semibold text-slate-900 mb-4">Task Status Breakdown</h3>
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={stats.taskStatusStats}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.14)" />
                 <XAxis dataKey="status" />
                 <YAxis />
-                <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }} />
+                <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid rgba(183,228,255,0.3)", background: "rgba(15,18,22,0.95)", color: "#d6dde5" }} />
                 <Legend />
-                <Bar dataKey="count" fill="#3b82f6" name="Count" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="count" fill="#d9c2a4" name="Count" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -329,7 +329,7 @@ export default function AnalyticsDashboard() {
             {stats.taskCompletionByProject.length > 0 ? (
               <ResponsiveContainer width="100%" height={280}>
                 <LineChart data={stats.taskCompletionByProject}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.14)" />
                   <XAxis
                     dataKey="projectName"
                     tick={{ fontSize: 11 }}
@@ -339,19 +339,24 @@ export default function AnalyticsDashboard() {
                   />
                   <YAxis domain={[0, 100]} />
                   <Tooltip
-                    contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
-                    formatter={(value: number, name: string) =>
-                      name === "Completion Rate"
-                        ? [`${value}%`, name]
-                        : [value, name]
-                    }
+                    contentStyle={{ borderRadius: "8px", border: "1px solid rgba(183,228,255,0.3)", background: "rgba(15,18,22,0.95)", color: "#d6dde5" }}
+                    formatter={(value, name) => {
+                      const numericValue =
+                        typeof value === "number"
+                          ? value
+                          : Number(value ?? 0);
+
+                      return name === "Completion Rate"
+                        ? [`${numericValue}%`, name]
+                        : [numericValue, name];
+                    }}
                   />
                   <Legend />
                   <Line
                     type="monotone"
                     dataKey="completionRate"
                     name="Completion Rate"
-                    stroke="#22c55e"
+                    stroke="#5f9fb8"
                     strokeWidth={2.5}
                     dot={{ r: 3 }}
                     activeDot={{ r: 5 }}
@@ -369,12 +374,12 @@ export default function AnalyticsDashboard() {
             <h3 className="text-lg font-semibold text-slate-900 mb-4">User Distribution by Role</h3>
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={stats.userStats}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.14)" />
                 <XAxis dataKey="role" />
                 <YAxis />
-                <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }} />
+                <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid rgba(183,228,255,0.3)", background: "rgba(15,18,22,0.95)", color: "#d6dde5" }} />
                 <Legend />
-                <Bar dataKey="count" fill="#10b981" name="Count" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="count" fill="#5f9fb8" name="Count" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -398,12 +403,12 @@ export default function AnalyticsDashboard() {
                   <tr key={user.userName} className="border-b border-slate-100 hover:bg-slate-50">
                     <td className="px-4 py-3 font-medium text-slate-900">{user.userName}</td>
                     <td className="px-4 py-3 text-center text-slate-600">{user.totalTasks}</td>
-                    <td className="px-4 py-3 text-center text-green-600 font-semibold">{user.completedTasks}</td>
+                    <td className="px-4 py-3 text-center text-[#d9c2a4] font-semibold">{user.completedTasks}</td>
                     <td className="px-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <div className="w-24 bg-slate-200 rounded-full h-2">
+                        <div className="w-24 bg-slate-700 rounded-full h-2">
                           <div
-                            className="bg-green-500 h-2 rounded-full"
+                            className="bg-[#d9c2a4] h-2 rounded-full"
                             style={{ width: `${user.completionRate}%` }}
                           ></div>
                         </div>
@@ -426,7 +431,7 @@ export default function AnalyticsDashboard() {
               placeholder="Search projects..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64 text-sm"
+              className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-300/30 focus:border-sky-300 w-full sm:w-64 text-sm"
             />
           </div>
           <div className="overflow-x-auto">
@@ -449,10 +454,10 @@ export default function AnalyticsDashboard() {
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                             project.status === "active"
-                              ? "bg-green-100 text-green-800"
+                                ? "bg-sky-200/15 text-sky-200 border border-sky-200/35"
                               : project.status === "completed"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-slate-100 text-slate-800"
+                                ? "bg-[#d9c2a4]/15 text-[#e6d6c2] border border-[#d9c2a4]/35"
+                              : "bg-slate-100/10 text-slate-300 border border-slate-300/30"
                           }`}
                         >
                           {project.status}

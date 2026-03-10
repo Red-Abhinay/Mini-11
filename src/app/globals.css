@@ -436,25 +436,25 @@ body {
 }
 
 .analytics-action-btn--primary {
-  border-color: rgba(96, 165, 250, 0.5);
-  color: #bae6fd;
-  background: rgba(59, 130, 246, 0.18);
+  border-color: rgba(183, 228, 255, 0.4);
+  color: #d6e8f3;
+  background: rgba(183, 228, 255, 0.14);
 }
 
 .analytics-action-btn--primary:hover {
-  border-color: rgba(147, 197, 253, 0.72);
-  background: rgba(59, 130, 246, 0.26);
+  border-color: rgba(183, 228, 255, 0.58);
+  background: rgba(183, 228, 255, 0.2);
 }
 
 .analytics-action-btn--success {
-  border-color: rgba(74, 222, 128, 0.45);
-  color: #bbf7d0;
-  background: rgba(34, 197, 94, 0.16);
+  border-color: rgba(217, 194, 164, 0.45);
+  color: #e6d6c2;
+  background: rgba(217, 194, 164, 0.14);
 }
 
 .analytics-action-btn--success:hover {
-  border-color: rgba(134, 239, 172, 0.75);
-  background: rgba(34, 197, 94, 0.24);
+  border-color: rgba(217, 194, 164, 0.62);
+  background: rgba(217, 194, 164, 0.2);
 }
 
 .analytics-action-btn--neutral {

@@ -22,7 +22,7 @@ const menuItems: MenuItem[] = [
     ),
   },
   {
-    label: "Analytics Dashboard",
+    label: "Analytics",
     href: "/dashboard/analytics",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden="true">
@@ -83,13 +83,20 @@ export default function ManagerSidebar() {
           <Link
             key={item.href}
             href={item.href}
+            aria-current={isActive ? "page" : undefined}
             className={`flex items-center gap-3 rounded-xl px-5 py-4 text-base font-semibold transition ${
               isActive
-                ? "bg-slate-700 text-white shadow-md"
-                : "text-slate-300 hover:bg-slate-800"
+                ? "border border-sky-200/40 bg-sky-200/20 text-sky-50 shadow-[inset_0_0_0_1px_rgba(214,232,243,0.18),0_8px_20px_rgba(0,0,0,0.28)]"
+                : "border border-transparent text-slate-300 hover:border-white/10 hover:bg-slate-800"
             }`}
           >
-            <span className="text-slate-300 [&>svg]:h-5 [&>svg]:w-5">{item.icon}</span>
+            <span
+              className={`[&>svg]:h-5 [&>svg]:w-5 ${
+                isActive ? "text-sky-100" : "text-slate-300"
+              }`}
+            >
+              {item.icon}
+            </span>
             <span>{item.label}</span>
           </Link>
         );
