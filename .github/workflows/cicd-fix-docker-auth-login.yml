@@ -114,7 +114,7 @@ jobs:
             docker run -d \
               --name ${{ env.APP_NAME }} \
               --restart unless-stopped \
-              -p 127.0.0.1:${{ env.APP_PORT }}:3000 \
+              -p ${{ env.APP_PORT }}:3000 \
               -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
               -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
               -e NODE_ENV=production \
@@ -132,7 +132,7 @@ jobs:
           max_attempts=30
           attempt=1
           while [ $attempt -le $max_attempts ]; do
-            if curl -sf http://${{ secrets.EC2_HOST }}:${{ env.APP_PORT }}/login > /dev/null 2>&1; then
+            if curl -sf http://${{ secrets.ALB_DNS }}/login > /dev/null 2>&1; then
               echo "Application is healthy"
               exit 0
             fi
