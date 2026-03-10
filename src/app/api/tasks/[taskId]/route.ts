@@ -3,6 +3,13 @@ import { tasks } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
+const TASK_STATUSES = ["todo", "in_progress", "done"] as const;
+type TaskStatus = (typeof TASK_STATUSES)[number];
+
+function isTaskStatus(value: unknown): value is TaskStatus {
+  return typeof value === "string" && (TASK_STATUSES as readonly string[]).includes(value);
+}
+
 
 export async function GET(req: NextRequest) {
   try {
@@ -40,7 +47,7 @@ export async function POST(req: NextRequest) {
     if (!projectId || typeof projectId !== "string") {
       return NextResponse.json({ error: "projectId is required" }, { status: 400 });
     }
-    if (!["todo", "in_progress", "done"].includes(status)) {
+    if (!isTaskStatus(status)) {
       return NextResponse.json({ error: "Invalid status value" }, { status: 400 });
     }
 
@@ -76,7 +83,7 @@ export async function PATCH(
       return NextResponse.json({ error: "taskId is required" }, { status: 400 });
     }
 
-    if (status !== undefined && !["todo", "in_progress", "done"].includes(status)) {
+    if (status !== undefined && !isTaskStatus(status)) {
       return NextResponse.json({ error: "Invalid status value" }, { status: 400 });
     }
 
@@ -84,7 +91,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid assigned_to value" }, { status: 400 });
     }
 
-    const updatePayload: { status?: string; assignedTo?: string | null; updatedAt: Date } = {
+    const updatePayload: { status?: TaskStatus; assignedTo?: string | null; updatedAt: Date } = {
       updatedAt: new Date(),
     };
 

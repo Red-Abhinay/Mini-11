@@ -5,6 +5,13 @@ import { cookies } from "next/headers";
 const JWT_SECRET = process.env.JWT_SECRET!;
 const COOKIE_NAME = "auth_token";
 
+function shouldUseSecureCookie(): boolean {
+  if (process.env.COOKIE_SECURE === "false") {
+    return false;
+  }
+  return process.env.NODE_ENV === "production";
+}
+
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12);
 }
@@ -35,7 +42,7 @@ export async function setAuthCookie(token: string): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookie(),
     sameSite: "lax",
     maxAge: 60 * 60 * 24 * 7,
     path: "/",

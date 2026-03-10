@@ -1,0 +1,25 @@
+# Node and Next build artifacts
+node_modules
+.next
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local environment and secrets
+.env*
+!.env.example
+
+# VCS and editor files
+.git
+.gitignore
+.vscode
+.idea
+
+# Documentation and local tooling
+README.md
+neon-postgres
+
+# OS junk
+.DS_Store
+Thumbs.db

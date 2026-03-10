@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   DndContext,
@@ -95,7 +95,7 @@ const moveTaskToStatus = (
   return columns.flatMap((column) => grouped[column.id]);
 };
 
-const KanbanPage = () => {
+const KanbanPageContent = () => {
   const searchParams = useSearchParams();
   const initialProjectId = searchParams.get("projectId") || "all";
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -389,4 +389,10 @@ const KanbanTaskCard = ({ task }: { task: Task }) => (
   </div>
 );
 
-export default KanbanPage;
+export default function KanbanPage() {
+  return (
+    <Suspense fallback={<div className="kanban-loading">Loading board...</div>}>
+      <KanbanPageContent />
+    </Suspense>
+  );
+}

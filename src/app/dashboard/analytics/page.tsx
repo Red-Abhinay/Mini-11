@@ -340,11 +340,13 @@ export default function AnalyticsDashboard() {
                   <YAxis domain={[0, 100]} />
                   <Tooltip
                     contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
-                    formatter={(value: number, name: string) =>
-                      name === "Completion Rate"
-                        ? [`${value}%`, name]
-                        : [value, name]
-                    }
+                    formatter={(value, name) => {
+                      if (name === "Completion Rate" && typeof value === "number") {
+                        return [`${value}%`, name];
+                      }
+
+                      return [value ?? "-", name];
+                    }}
                   />
                   <Legend />
                   <Line
