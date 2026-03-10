@@ -2,12 +2,18 @@ import { db } from "@/lib/db";
 import { projects, tasks } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
+import { getSessionUser } from "@/lib/auth";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
+    const session = await getSessionUser();
+    if (!session || session.role !== "manager") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { projectId } = await params;
 
     // Fetch project details
@@ -25,6 +31,10 @@ export async function GET(
     }
 
     const project = projectData[0];
+
+    if (project.managerId !== session.userId) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
 
     // Fetch all tasks for this project
     const projectTasks = await db
@@ -45,6 +55,7 @@ export async function GET(
         description: task.description,
         status: task.status,
         projectId: task.projectId,
+        assignedTo: task.assignedTo,
       })),
     });
   } catch (error) {

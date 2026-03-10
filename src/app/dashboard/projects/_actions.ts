@@ -4,24 +4,27 @@ import { db } from "@/db";
 import { projects } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { v4 as uuidv4 } from "uuid"; 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { getSessionUser } from "@/lib/auth";
 
 export async function createProject(formData: FormData) {
-  
-
 try {
-    const name = formData.get("name") as string;
-  const description = formData.get("description") as string;
-  const managerId = "proj-mgr-1"; 
+    const session = await getSessionUser();
+    if (!session || session.role !== "manager") {
+      return { success: false, message: "Unauthorized." };
+    }
 
-  await db.insert(projects).values({
-    id: uuidv4(), 
-    name,
-    description,
-    managerId,
-    status: "planning",
-  });
-  revalidatePath("/dashboard/projects");
+    const name = formData.get("name") as string;
+    const description = formData.get("description") as string;
+
+    await db.insert(projects).values({
+      id: uuidv4(), 
+      name,
+      description,
+      managerId: session.userId,
+      status: "planning",
+    });
+    revalidatePath("/dashboard/projects");
     return { success: true, message: "Project created!" };
   } catch (e) {
     return { success: false, message: "Failed to create project." };
@@ -30,12 +33,25 @@ try {
 }
 
 export async function deleteProject(id: string) {
-  await db.delete(projects).where(eq(projects.id, id));
+  const session = await getSessionUser();
+  if (!session || session.role !== "manager") {
+    return { success: false, message: "Unauthorized." };
+  }
+
+  await db
+    .delete(projects)
+    .where(and(eq(projects.id, id), eq(projects.managerId, session.userId)));
   revalidatePath("/dashboard/projects"); 
+  return { success: true };
 }
 
 export async function updateProject(id: string, formData: FormData) {
   try {
+    const session = await getSessionUser();
+    if (!session || session.role !== "manager") {
+      return { success: false, message: "Unauthorized." };
+    }
+
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
 
@@ -45,7 +61,7 @@ export async function updateProject(id: string, formData: FormData) {
         description, 
         updatedAt: new Date() 
       })
-      .where(eq(projects.id, id));
+      .where(and(eq(projects.id, id), eq(projects.managerId, session.userId)));
 
     revalidatePath("/dashboard/projects");
     

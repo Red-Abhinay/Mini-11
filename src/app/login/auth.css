@@ -291,6 +291,10 @@
   cursor: not-allowed; 
 }
 
+.sign-up .submit-btn {
+  margin-top: 20px;
+}
+
 .msg-error {
   text-align: center;
   color: #ffd0d0;
@@ -312,6 +316,27 @@
   font-size: 0.85rem;
   margin-top: 10px;
   font-weight: 500;
+}
+
+.signup-feedback {
+  width: min(320px, 100%);
+  margin: 10px auto 0;
+}
+
+.sign-up .signup-feedback.msg-error,
+.sign-up .signup-feedback.msg-success {
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+.sign-up .signup-feedback.msg-error {
+  color: #ff9d9d;
+}
+
+.sign-up .signup-feedback.msg-success {
+  color: #9dffb8;
 }
 
 .sign-in { transition-timing-function: ease-out; }

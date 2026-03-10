@@ -201,8 +201,8 @@ export default function AuthPage() {
               </select>
             </label>
 
-            {isSignup && error && <p className="msg-error">{error}</p>}
-            {isSignup && successMsg && <p className="msg-success">{successMsg}</p>}
+            {isSignup && error && <p className="msg-error signup-feedback">{error}</p>}
+            {isSignup && successMsg && <p className="msg-success signup-feedback">{successMsg}</p>}
 
             <button className="submit-btn" onClick={handleSignup} disabled={loading}>
               {loading ? "Creating…" : "Sign Up"}

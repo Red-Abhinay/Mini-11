@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} antialiased`}
+        className={`app-theme ${spaceGrotesk.variable} ${ibmPlexMono.variable} antialiased`}
       >
         {children}
         <Toaster 

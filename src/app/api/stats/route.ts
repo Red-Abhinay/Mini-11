@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { users, projects, tasks, projectMembers } from "@/lib/schema";
-import { eq, count, sql } from "drizzle-orm";
+import { neon } from "@neondatabase/serverless";
 
 // GET /api/stats - Get dashboard statistics (Manager only)
 export async function GET() {
@@ -24,136 +22,99 @@ export async function GET() {
       );
     }
 
-    // Get user statistics
-    const userStats = await db
-      .select({
-        role: users.role,
-        count: count(),
-      })
-      .from(users)
-      .groupBy(users.role);
+    const sql = neon(process.env.DATABASE_URL!);
 
-    // Get project statistics by status
-    const projectStats = await db
-      .select({
-        status: projects.status,
-        count: count(),
-      })
-      .from(projects)
-      .groupBy(projects.status);
+    const [userStats, projectStats, taskStatusStats, totalsRow, recentProjects, projectsWithTaskCounts, taskCompletionByProject, tasksByUser] =
+      await Promise.all([
+        sql`SELECT role, COUNT(*)::int AS count FROM users GROUP BY role`,
+        sql`SELECT status, COUNT(*)::int AS count FROM projects GROUP BY status`,
+        sql`SELECT status, COUNT(*)::int AS count FROM tasks GROUP BY status`,
+        sql`
+          SELECT
+            (SELECT COUNT(*)::int FROM users) AS "totalUsers",
+            (SELECT COUNT(*)::int FROM projects) AS "totalProjects",
+            (SELECT COUNT(*)::int FROM tasks) AS "totalTasks"
+        `,
+        sql`
+          SELECT
+            p.id,
+            p.name,
+            COALESCE(p.status, 'active') AS status,
+            p.created_at AS "createdAt",
+            m.name AS "managerName"
+          FROM projects p
+          LEFT JOIN users m ON p.manager_id::text = m.id::text
+          ORDER BY p.created_at DESC
+          LIMIT 5
+        `,
+        sql`
+          SELECT
+            p.name AS "projectName",
+            COUNT(t.id)::int AS "totalTasks"
+          FROM projects p
+          LEFT JOIN tasks t ON p.id = t.project_id
+          GROUP BY p.id, p.name
+          ORDER BY COUNT(t.id) DESC
+          LIMIT 10
+        `,
+        sql`
+          SELECT
+            p.name AS "projectName",
+            COUNT(t.id)::int AS "totalTasks",
+            COUNT(CASE WHEN t.status = 'done' THEN 1 END)::int AS "completedTasks"
+          FROM projects p
+          LEFT JOIN tasks t ON p.id = t.project_id
+          GROUP BY p.id, p.name
+          HAVING COUNT(t.id) > 0
+          LIMIT 10
+        `,
+        sql`
+          SELECT
+            u.name AS "userName",
+            COUNT(t.id)::int AS "totalTasks",
+            COUNT(CASE WHEN t.status = 'done' THEN 1 END)::int AS "completedTasks"
+          FROM users u
+          LEFT JOIN tasks t ON u.id::text = t.assigned_to::text
+          WHERE u.role = 'employee'
+          GROUP BY u.id, u.name
+          HAVING COUNT(t.id) > 0
+          LIMIT 10
+        `,
+      ]);
 
-    // Get task statistics by status
-    const taskStatusStats = await db
-      .select({
-        status: tasks.status,
-        count: count(),
-      })
-      .from(tasks)
-      .groupBy(tasks.status);
+    const totals = totalsRow[0] || { totalUsers: 0, totalProjects: 0, totalTasks: 0 };
 
-    // Get task statistics by priority
-    const taskPriorityStats = await db
-      .select({
-        priority: tasks.priority,
-        count: count(),
-      })
-      .from(tasks)
-      .groupBy(tasks.priority);
-
-    // Get total counts
-    const totalUsers = await db.select({ count: count() }).from(users);
-    const totalProjects = await db.select({ count: count() }).from(projects);
-    const totalTasks = await db.select({ count: count() }).from(tasks);
-
-    // Get recent projects
-    const recentProjects = await db
-      .select({
-        id: projects.id,
-        name: projects.name,
-        status: projects.status,
-        createdAt: projects.createdAt,
-        managerName: users.name,
-      })
-      .from(projects)
-      .leftJoin(users, eq(projects.managerId, users.id))
-      .orderBy(sql`${projects.createdAt} DESC`)
-      .limit(5);
-
-    // Get projects with task counts
-    const projectsWithTaskCounts = await db
-      .select({
-        projectName: projects.name,
-        totalTasks: count(tasks.id),
-      })
-      .from(projects)
-      .leftJoin(tasks, eq(projects.id, tasks.projectId))
-      .groupBy(projects.id, projects.name)
-      .orderBy(sql`count(${tasks.id}) DESC`)
-      .limit(10);
-
-    // Get task completion rate by project
-    const taskCompletionByProject = await db
-      .select({
-        projectName: projects.name,
-        totalTasks: count(tasks.id),
-        completedTasks: sql<number>`COUNT(CASE WHEN ${tasks.status} = 'done' THEN 1 END)`,
-      })
-      .from(projects)
-      .leftJoin(tasks, eq(projects.id, tasks.projectId))
-      .groupBy(projects.id, projects.name)
-      .having(sql`count(${tasks.id}) > 0`)
-      .limit(10);
-
-    // Get overdue tasks count
-    const overdueTasks = await db
-      .select({ count: count() })
-      .from(tasks)
-      .where(sql`${tasks.dueDate} < NOW() AND ${tasks.status} != 'done'`);
-
-    // Get tasks by user
-    const tasksByUser = await db
-      .select({
-        userName: users.name,
-        totalTasks: count(tasks.id),
-        completedTasks: sql<number>`COUNT(CASE WHEN ${tasks.status} = 'done' THEN 1 END)`,
-      })
-      .from(users)
-      .leftJoin(tasks, eq(users.id, tasks.assignedTo))
-      .where(eq(users.role, "employee"))
-      .groupBy(users.id, users.name)
-      .having(sql`count(${tasks.id}) > 0`)
-      .limit(10);
+    // Current tasks table does not have due_date/priority in this DB shape.
+    const overdueTasks = 0;
+    const taskPriorityStats: Array<{ priority: string; count: number }> = [];
 
     return NextResponse.json({
       summary: {
-        totalUsers: totalUsers[0]?.count || 0,
-        totalProjects: totalProjects[0]?.count || 0,
-        totalTasks: totalTasks[0]?.count || 0,
-        overdueTasks: overdueTasks[0]?.count || 0,
+        totalUsers: Number(totals.totalUsers || 0),
+        totalProjects: Number(totals.totalProjects || 0),
+        totalTasks: Number(totals.totalTasks || 0),
+        overdueTasks,
       },
       userStats: userStats.map(stat => ({
-        role: stat.role,
+        role: String(stat.role),
         count: Number(stat.count),
       })),
       projectStats: projectStats.map(stat => ({
-        status: stat.status,
+        status: String(stat.status),
         count: Number(stat.count),
       })),
       taskStatusStats: taskStatusStats.map(stat => ({
-        status: stat.status,
+        status: String(stat.status),
         count: Number(stat.count),
       })),
-      taskPriorityStats: taskPriorityStats.map(stat => ({
-        priority: stat.priority,
-        count: Number(stat.count),
-      })),
+      taskPriorityStats,
       recentProjects,
       projectsWithTaskCounts: projectsWithTaskCounts.map(p => ({
-        projectName: p.projectName,
+        projectName: String(p.projectName),
         totalTasks: Number(p.totalTasks),
       })),
       taskCompletionByProject: taskCompletionByProject.map(p => ({
-        projectName: p.projectName,
+        projectName: String(p.projectName),
         totalTasks: Number(p.totalTasks),
         completedTasks: Number(p.completedTasks),
         completionRate: Number(p.totalTasks) > 0 
@@ -161,7 +122,7 @@ export async function GET() {
           : 0,
       })),
       tasksByUser: tasksByUser.map(u => ({
-        userName: u.userName,
+        userName: String(u.userName),
         totalTasks: Number(u.totalTasks),
         completedTasks: Number(u.completedTasks),
         completionRate: Number(u.totalTasks) > 0 

@@ -2,23 +2,25 @@ import { db } from "@/lib/db";
 import { projects } from "@/db/schema";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { eq } from "drizzle-orm";
-import { getServerSession } from "next-auth";
+import { getSessionUser } from "@/lib/auth";
 import { Project } from "@/db/schema";
 import { CreateProjectModal } from "@/components/projects/CreateProjectModal";
+import { redirect } from "next/navigation";
 
 export default async function ProjectsPage() {
-  const session = await getServerSession();
-  // if (!session || !session.user) {
-  //   redirect("/login");
-  // }
+  const session = await getSessionUser();
+  if (!session) {
+    redirect("/login");
+  }
 
-  // FOR TESTING:
-  const testUserId = session?.user?.id || "proj-mgr-1";
+  if (session.role !== "manager") {
+    redirect("/dashboard/employee");
+  }
 
   const allProjects = await db
     .select()
     .from(projects)
-    .where(eq(projects.managerId, testUserId));
+    .where(eq(projects.managerId, session.userId));
 
   return (
     <div className="projects-page">

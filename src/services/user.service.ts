@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { users, projects, projectMembers } from "@/lib/schema";
 import { eq, and, sql } from "drizzle-orm";
+import { neon } from "@neondatabase/serverless";
 
 export async function createUser(data: {
   name: string;
@@ -109,47 +110,41 @@ export async function deleteUser(id: string) {
 
 // Get users with their assigned projects
 export async function getUsersWithProjects() {
-  // Get all users
-  const allUsers = await db
-    .select({
-      id: users.id,
-      name: users.name,
-      email: users.email,
-      role: users.role,
-      createdAt: users.createdAt,
-    })
-    .from(users)
-    .orderBy(users.name);
+  const sqlClient = neon(process.env.DATABASE_URL!);
 
-  // For each user, get their projects
+  const allUsers = await sqlClient`
+    SELECT id, name, email, role, created_at AS "createdAt"
+    FROM users
+    ORDER BY name
+  `;
+
   const usersWithProjects = await Promise.all(
     allUsers.map(async (user) => {
-      // Get projects where user is a member
-      const userProjects = await db
-        .select({
-          id: projects.id,
-          name: projects.name,
-          status: projects.status,
-        })
-        .from(projectMembers)
-        .innerJoin(projects, eq(projectMembers.projectId, projects.id))
-        .where(eq(projectMembers.userId, user.id));
+      // Assigned projects are derived from task assignments.
+      const assignedProjects = await sqlClient`
+        SELECT DISTINCT
+          p.id,
+          p.name,
+          COALESCE(p.status, 'active') AS status
+        FROM tasks t
+        INNER JOIN projects p ON t.project_id = p.id
+        WHERE t.assigned_to::text = ${user.id}::text
+      `;
 
-      // Get projects where user is the manager
-      const managedProjects = await db
-        .select({
-          id: projects.id,
-          name: projects.name,
-          status: projects.status,
-        })
-        .from(projects)
-        .where(eq(projects.managerId, user.id));
+      const managedProjects = await sqlClient`
+        SELECT
+          p.id,
+          p.name,
+          COALESCE(p.status, 'active') AS status
+        FROM projects p
+        WHERE p.manager_id::text = ${user.id}::text
+      `;
 
       return {
         ...user,
-        assignedProjects: userProjects,
-        managedProjects: managedProjects,
-        totalProjects: userProjects.length + managedProjects.length,
+        assignedProjects,
+        managedProjects,
+        totalProjects: assignedProjects.length + managedProjects.length,
       };
     })
   );
@@ -159,33 +154,40 @@ export async function getUsersWithProjects() {
 
 // Get user with projects by ID
 export async function getUserWithProjects(id: string) {
-  const user = await findUserById(id);
-  if (!user) return null;
+  const sqlClient = neon(process.env.DATABASE_URL!);
 
-  // Get projects where user is a member
-  const userProjects = await db
-    .select({
-      id: projects.id,
-      name: projects.name,
-      description: projects.description,
-      status: projects.status,
-      createdAt: projects.createdAt,
-    })
-    .from(projectMembers)
-    .innerJoin(projects, eq(projectMembers.projectId, projects.id))
-    .where(eq(projectMembers.userId, id));
+  const userRows = await sqlClient`
+    SELECT id, name, email, role, created_at AS "createdAt", updated_at AS "updatedAt"
+    FROM users
+    WHERE id::text = ${id}::text
+    LIMIT 1
+  `;
 
-  // Get projects where user is the manager
-  const managedProjects = await db
-    .select({
-      id: projects.id,
-      name: projects.name,
-      description: projects.description,
-      status: projects.status,
-      createdAt: projects.createdAt,
-    })
-    .from(projects)
-    .where(eq(projects.managerId, id));
+  if (userRows.length === 0) return null;
+  const user = userRows[0];
+
+  const assignedProjects = await sqlClient`
+    SELECT DISTINCT
+      p.id,
+      p.name,
+      p.description,
+      COALESCE(p.status, 'active') AS status,
+      p.created_at AS "createdAt"
+    FROM tasks t
+    INNER JOIN projects p ON t.project_id = p.id
+    WHERE t.assigned_to::text = ${id}::text
+  `;
+
+  const managedProjects = await sqlClient`
+    SELECT
+      p.id,
+      p.name,
+      p.description,
+      COALESCE(p.status, 'active') AS status,
+      p.created_at AS "createdAt"
+    FROM projects p
+    WHERE p.manager_id::text = ${id}::text
+  `;
 
   return {
     id: user.id,
@@ -194,7 +196,7 @@ export async function getUserWithProjects(id: string) {
     role: user.role,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
-    assignedProjects: userProjects,
-    managedProjects: managedProjects,
+    assignedProjects,
+    managedProjects,
   };
 }
