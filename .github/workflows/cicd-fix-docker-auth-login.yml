@@ -118,6 +118,7 @@ jobs:
               -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
               -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
               -e NODE_ENV=production \
+              -e COOKIE_SECURE=false \
               "${{ needs.ci.outputs.image_uri }}"
             
             # Cleanup old images
