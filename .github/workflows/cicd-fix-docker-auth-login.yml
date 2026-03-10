@@ -45,7 +45,7 @@ jobs:
 
       - name: Build Docker image
         id: image
-        working-directory: ./Mini-11
+        working-directory: .
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -84,9 +84,7 @@ jobs:
       - name: Get EC2 instance details from Terraform
         id: tf-outputs
         run: |
-          cd terraform/environments/dev
-          # Note: You should use terraform output after applying Terraform
-          # For now, using secrets as fallback
+          # Using GitHub secret for EC2 host
           echo "ec2_host=${{ secrets.EC2_HOST }}" >> "$GITHUB_OUTPUT"
 
       - name: Deploy container on EC2
