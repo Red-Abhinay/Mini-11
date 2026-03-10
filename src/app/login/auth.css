@@ -1,0 +1,360 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+.auth-page-wrapper {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px 64px;
+  font-family: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  color: #f4f6f8;
+  background: radial-gradient(1200px 600px at 10% -10%, #ffddb2 0%, rgba(255, 221, 178, 0) 60%),
+    radial-gradient(900px 600px at 100% 0%, #b7e4ff 0%, rgba(183, 228, 255, 0) 60%),
+    #0f1216;
+}
+
+.cont {
+  border-radius: 28px;
+  overflow: hidden;
+  position: relative;
+  width: 900px;
+  height: 550px;
+  margin: 0 auto;
+  background: rgba(26, 32, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  backdrop-filter: blur(20px);
+}
+
+.form {
+  position: relative;
+  width: 640px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 1.2s ease-in-out;
+  padding: 50px 30px 0;
+}
+
+.sub-cont {
+  overflow: hidden;
+  position: absolute;
+  left: 640px;
+  top: 0;
+  width: 900px;
+  height: 100%;
+  padding-left: 260px;
+  background: rgba(26, 32, 42, 0.85);
+  transition: transform 1.2s ease-in-out;
+}
+
+.cont.s--signup .sub-cont {
+  transform: translate3d(-640px, 0, 0);
+}
+
+.img {
+  overflow: hidden;
+  z-index: 2;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 260px;
+  height: 100%;
+  padding-top: 360px;
+}
+
+.img::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 900px;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(183, 228, 255, 0.25) 0%, rgba(255, 221, 178, 0.25) 100%);
+  backdrop-filter: blur(10px);
+  transition: transform 1.2s ease-in-out;
+}
+
+.img::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(20, 25, 35, 0.85);
+}
+
+.cont.s--signup .img::before {
+  transform: translate3d(640px, 0, 0);
+}
+
+.img__text {
+  z-index: 2;
+  position: absolute;
+  left: 0;
+  top: 50px;
+  width: 100%;
+  padding: 0 20px;
+  text-align: center;
+  color: #fff;
+  transition: transform 1.2s ease-in-out;
+}
+
+.img__text h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #f4f6f8;
+  letter-spacing: -0.01em;
+}
+
+.cont.s--signup .img__text.m--up { transform: translateX(520px); }
+.img__text.m--in { transform: translateX(-520px); }
+.cont.s--signup .img__text.m--in { transform: translateX(0); }
+
+.img__btn {
+  overflow: hidden;
+  z-index: 2;
+  position: relative;
+  width: 120px;
+  height: 39px;
+  margin: 0 auto;
+  background: transparent;
+  color: #f4f6f8;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  cursor: pointer;
+  font-family: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  letter-spacing: 0.1em;
+}
+
+.img__btn::after {
+  content: '';
+  z-index: 2;
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  border: 2px solid rgba(183, 228, 255, 0.6);
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+
+.img__btn:hover::after {
+  border-color: rgba(183, 228, 255, 1);
+  box-shadow: 0 0 15px rgba(183, 228, 255, 0.3);
+}
+
+.img__btn span {
+  position: absolute;
+  left: 0; top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; height: 100%;
+  transition: transform 1.2s ease-in-out;
+  letter-spacing: 0.5px;
+}
+
+.img__btn span.m--in { transform: translateY(-72px); }
+.cont.s--signup .img__btn span.m--in { transform: translateY(0); }
+.cont.s--signup .img__btn span.m--up { transform: translateY(72px); }
+
+.form h2 {
+  width: 100%;
+  text-align: center;
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: #f4f6f8;
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
+}
+
+.form label {
+  display: block;
+  width: min(320px, 100%);
+  margin: 22px auto 0;
+  text-align: center;
+}
+
+.form label span.label-text {
+  display: block;
+  font-family: "IBM Plex Mono", "Space Grotesk", sans-serif;
+  font-size: 0.68rem;
+  color: rgba(244, 246, 248, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 6px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.form input,
+.form select {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  font-family: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  background: rgba(15, 18, 22, 0.9);
+  color: #f4f6f8;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.3s, box-shadow 0.2s;
+}
+
+.form input:focus,
+.form select:focus { 
+  border-color: rgba(183, 228, 255, 0.6);
+  box-shadow: 0 0 0 2px rgba(183, 228, 255, 0.2);
+}
+
+.form select option { 
+  color: #f4f6f8; 
+  background: rgba(15, 18, 22, 0.95);
+}
+
+.password-field { 
+  position: relative;}
+
+.password-field input {
+  padding-right: 10px;
+}
+
+.toggle-btn {
+  position: absolute;
+  right: 10px; 
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: rgba(183, 228, 255, 0.8);
+  user-select: none;
+  font-weight: 500;
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  font-family: "IBM Plex Mono", "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: color 0.2s;
+}
+
+.toggle-btn:hover {
+  color: rgba(183, 228, 255, 1);
+}
+
+.forgot-link {
+  display: block;
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(244, 246, 248, 0.6);
+  margin-top: 10px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.forgot-link:hover { 
+  color: rgba(183, 228, 255, 0.8);
+}
+
+.submit-btn {
+  display: block;
+  margin: 30px auto 0;
+  width: min(320px, 100%);
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(183, 228, 255, 0.2);
+  color: #f4f6f8;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid rgba(183, 228, 255, 0.4);
+  outline: none;
+  transition: all 0.25s;
+}
+
+.submit-btn:hover:not(:disabled) { 
+  background: rgba(183, 228, 255, 0.3);
+  border-color: rgba(183, 228, 255, 0.6);
+  box-shadow: 0 0 20px rgba(183, 228, 255, 0.2);
+}
+
+.submit-btn:disabled { 
+  opacity: 0.4; 
+  cursor: not-allowed; 
+}
+
+.sign-up .submit-btn {
+  margin-top: 20px;
+}
+
+.msg-error {
+  text-align: center;
+  color: #ffd0d0;
+  background: rgba(255, 122, 122, 0.12);
+  border: 1px solid rgba(255, 122, 122, 0.4);
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  margin-top: 10px;
+}
+
+.msg-success {
+  text-align: center;
+  color: #d0ffd0;
+  background: rgba(122, 255, 122, 0.12);
+  border: 1px solid rgba(122, 255, 122, 0.4);
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+.signup-feedback {
+  width: min(320px, 100%);
+  margin: 10px auto 0;
+}
+
+.sign-up .signup-feedback.msg-error,
+.sign-up .signup-feedback.msg-success {
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+.sign-up .signup-feedback.msg-error {
+  color: #ff9d9d;
+}
+
+.sign-up .signup-feedback.msg-success {
+  color: #9dffb8;
+}
+
+.sign-in { transition-timing-function: ease-out; }
+
+.cont.s--signup .sign-in {
+  transition-timing-function: ease-in-out;
+  transition-duration: 1.2s;
+  transform: translate3d(640px, 0, 0);
+}
+
+.sign-up { transform: translate3d(-900px, 0, 0); }
+.cont.s--signup .sign-up { transform: translate3d(0, 0, 0); }
+
+@media (max-width: 960px) {
+  .cont { width: 95vw; height: auto; min-height: 550px; }
+  .form { width: 100%; padding: 42px 20px 28px; }
+  .form label,
+  .submit-btn {
+    width: min(340px, 100%);
+  }
+}
