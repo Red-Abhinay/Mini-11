@@ -68,13 +68,13 @@ export default function UsersWithProjectsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-slate-50">
+      <div className="users-page flex min-h-screen flex-col md:flex-row">
       <ManagerSidebar />
-      <div className="flex-1 p-8">
-        <div className="max-w-7xl mx-auto">
+      <div className="users-shell flex-1 p-8">
+        <div className="kanban-shell users-with-projects-shell">
           <div className="animate-pulse">
             <div className="h-8 bg-slate-200 rounded w-1/3 mb-6"></div>
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="users-panel rounded-lg p-6">
               <div className="space-y-4">
                 {[1, 2, 3, 4].map((i) => (
                   <div key={i} className="h-20 bg-slate-100 rounded"></div>
@@ -90,17 +90,17 @@ export default function UsersWithProjectsPage() {
 
   if (error) {
     return (
-      <div className="flex min-h-screen bg-slate-50">
+      <div className="users-page flex min-h-screen flex-col md:flex-row">
       <ManagerSidebar />
-      <div className="flex-1 p-8">
-        <div className="max-w-7xl mx-auto">
+      <div className="users-shell flex-1 p-8">
+        <div className="kanban-shell users-with-projects-shell">
           <button
             onClick={() => router.push("/dashboard/users")}
-            className="mb-4 text-slate-600 hover:text-slate-900 transition-colors"
+            className="users-row-action mb-4"
           >
             ← Back to Users
           </button>
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="users-panel text-red-300 px-4 py-3 rounded-lg">
             {error}
           </div>
         </div>
@@ -110,22 +110,23 @@ export default function UsersWithProjectsPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="users-page flex min-h-screen flex-col md:flex-row">
       <ManagerSidebar />
-      <div className="flex-1 p-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="users-shell flex-1 p-8">
+      <div className="kanban-shell users-with-projects-shell">
         {/* Header */}
-        <div className="mb-6 bg-white rounded-lg shadow-md p-6 sticky top-0 z-10">
+        <div className="users-with-projects-header mb-6 sticky top-0 z-10">
           <button
             onClick={() => router.push("/dashboard/users")}
-            className="mb-4 text-slate-600 hover:text-slate-900 transition-colors flex items-center"
+            className="users-row-action mb-4 flex items-center"
           >
             ← Back to Users
           </button>
-          <div className="flex justify-between items-center">
+          <div className="kanban-header">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">Users with Projects</h1>
-              <p className="text-slate-600 mt-1">
+              <p className="kanban-eyebrow">Team matrix</p>
+              <h1>Users with Projects</h1>
+              <p className="kanban-subtitle mt-1">
                 View all users and their assigned projects
               </p>
             </div>
@@ -133,10 +134,10 @@ export default function UsersWithProjectsPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div className="users-panel rounded-lg p-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="users-with-projects-label block text-sm font-medium text-slate-700 mb-2">
                 Search Users
               </label>
               <input
@@ -148,7 +149,7 @@ export default function UsersWithProjectsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="users-with-projects-label block text-sm font-medium text-slate-700 mb-2">
                 Filter by Role
               </label>
               <select
@@ -166,52 +167,52 @@ export default function UsersWithProjectsPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow-md p-4">
-            <h3 className="text-sm font-medium text-slate-500">Total Users</h3>
+          <div className="users-panel rounded-lg p-4">
+            <h3 className="users-with-projects-label text-sm font-medium text-slate-500">Total Users</h3>
             <p className="text-2xl font-bold text-slate-900 mt-1">{users.length}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-4">
-            <h3 className="text-sm font-medium text-slate-500">Managers</h3>
-            <p className="text-2xl font-bold text-purple-600 mt-1">
+          <div className="users-panel rounded-lg p-4">
+            <h3 className="users-with-projects-label text-sm font-medium text-slate-500">Managers</h3>
+            <p className="text-2xl font-bold text-sky-300 mt-1">
               {users.filter((u) => u.role === "manager").length}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-4">
-            <h3 className="text-sm font-medium text-slate-500">Employees</h3>
+          <div className="users-panel rounded-lg p-4">
+            <h3 className="users-with-projects-label text-sm font-medium text-slate-500">Employees</h3>
             <p className="text-2xl font-bold text-green-600 mt-1">
               {users.filter((u) => u.role === "employee").length}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-4">
-            <h3 className="text-sm font-medium text-slate-500">Filtered Results</h3>
-            <p className="text-2xl font-bold text-blue-600 mt-1">
+          <div className="users-panel rounded-lg p-4">
+            <h3 className="users-with-projects-label text-sm font-medium text-slate-500">Filtered Results</h3>
+            <p className="text-2xl font-bold text-sky-300 mt-1">
               {filteredUsers.length}
             </p>
           </div>
         </div>
 
         {/* Users Table */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="users-panel rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
+                  <th className="users-with-projects-th px-6 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
                     User
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
+                  <th className="users-with-projects-th px-6 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
                     Role
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
+                  <th className="users-with-projects-th px-6 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
                     Total Projects
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
+                  <th className="users-with-projects-th px-6 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
                     Managed Projects
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
+                  <th className="users-with-projects-th px-6 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
                     Assigned Projects
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
+                  <th className="users-with-projects-th px-6 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -229,10 +230,10 @@ export default function UsersWithProjectsPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        className={`users-role-badge ${
                           user.role === "manager"
-                            ? "bg-purple-100 text-purple-800"
-                            : "bg-green-100 text-green-800"
+                            ? "users-role-badge--manager"
+                            : "users-role-badge--employee"
                         }`}
                       >
                         {user.role}
@@ -249,14 +250,14 @@ export default function UsersWithProjectsPage() {
                           {user.managedProjects.map((project) => (
                             <div
                               key={project.id}
-                              className="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded"
+                              className="users-project-chip users-project-chip--managed"
                             >
                               {project.name}
                               <span
-                                className={`ml-1 ${
+                                className={`ml-1 users-project-chip-status ${
                                   project.status === "active"
-                                    ? "text-green-600"
-                                    : "text-slate-600"
+                                    ? "users-project-chip-status--active"
+                                    : "users-project-chip-status--inactive"
                                 }`}
                               >
                                 ({project.status})
@@ -265,7 +266,7 @@ export default function UsersWithProjectsPage() {
                           ))}
                         </div>
                       ) : (
-                        <span className="text-sm text-slate-400">None</span>
+                        <span className="users-project-chip users-project-chip--empty">None</span>
                       )}
                     </td>
                     <td className="px-6 py-4">
@@ -274,14 +275,14 @@ export default function UsersWithProjectsPage() {
                           {user.assignedProjects.map((project) => (
                             <div
                               key={project.id}
-                              className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded"
+                              className="users-project-chip users-project-chip--assigned"
                             >
                               {project.name}
                               <span
-                                className={`ml-1 ${
+                                className={`ml-1 users-project-chip-status ${
                                   project.status === "active"
-                                    ? "text-green-600"
-                                    : "text-slate-600"
+                                    ? "users-project-chip-status--active"
+                                    : "users-project-chip-status--inactive"
                                 }`}
                               >
                                 ({project.status})
@@ -290,13 +291,13 @@ export default function UsersWithProjectsPage() {
                           ))}
                         </div>
                       ) : (
-                        <span className="text-sm text-slate-400">None</span>
+                        <span className="users-project-chip users-project-chip--empty">None</span>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
                         onClick={() => router.push(`/dashboard/users/${user.id}`)}
-                        className="text-slate-600 hover:text-slate-900 transition-colors"
+                        className="users-row-action"
                       >
                         View Details
                       </button>

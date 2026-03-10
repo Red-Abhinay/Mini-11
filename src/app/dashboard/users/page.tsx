@@ -128,9 +128,9 @@ export default function UsersPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen flex-col bg-slate-50 md:flex-row">
+      <div className="users-page flex min-h-screen flex-col md:flex-row">
         <ManagerSidebar />
-        <div className="flex flex-1 items-center justify-center p-8">
+        <div className="users-shell flex flex-1 items-center justify-center p-8">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
             <p className="mt-4 text-slate-600">Loading users...</p>
@@ -142,10 +142,10 @@ export default function UsersPage() {
 
   if (error) {
     return (
-      <div className="flex min-h-screen flex-col bg-slate-50 md:flex-row">
+      <div className="users-page flex min-h-screen flex-col md:flex-row">
         <ManagerSidebar />
-        <div className="flex flex-1 items-center justify-center p-8">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md">
+        <div className="users-shell flex flex-1 items-center justify-center p-8">
+          <div className="users-panel rounded-lg p-6 max-w-md">
             <h2 className="text-red-800 font-semibold text-lg mb-2">Error</h2>
             <p className="text-red-600">{error}</p>
           </div>
@@ -155,12 +155,12 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 md:flex-row">
+    <div className="users-page flex min-h-screen flex-col md:flex-row">
       <ManagerSidebar />
 
-      <div className="flex flex-1 flex-col">
+      <div className="users-shell flex flex-1 flex-col">
         {/* Header */}
-        <header className="sticky top-0 z-10 bg-white border-b border-slate-200 shadow-sm">
+        <header className="users-header sticky top-0 z-10 bg-white border-b border-slate-200 shadow-sm">
           <div className="px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
@@ -169,9 +169,9 @@ export default function UsersPage() {
               </div>
               <button
                 onClick={() => router.push("/dashboard/users/with-projects")}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                className="users-action-btn users-action-btn--primary"
               >
-                📋 View Users with Projects
+                View Users with Projects
               </button>
             </div>
           </div>
@@ -179,7 +179,7 @@ export default function UsersPage() {
 
         <main className="px-4 sm:px-6 lg:px-8 py-8">
         {/* Users Table */}
-        <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+        <div className="users-panel rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-50">
@@ -212,10 +212,10 @@ export default function UsersPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`px-2.5 py-0.5 inline-flex text-xs font-semibold rounded-full ${
+                        className={`users-role-badge ${
                           user.role === "manager"
-                            ? "bg-purple-100 text-purple-800"
-                            : "bg-green-100 text-green-800"
+                            ? "users-role-badge--manager"
+                            : "users-role-badge--employee"
                         }`}
                       >
                         {user.role}
@@ -227,13 +227,13 @@ export default function UsersPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                       <button
                         onClick={() => router.push(`/dashboard/users/${user.id}`)}
-                        className="text-blue-600 hover:text-blue-900"
+                        className="users-row-action"
                       >
                         View
                       </button>
                       <button
                         onClick={() => handleEdit(user)}
-                        className="text-indigo-600 hover:text-indigo-900"
+                        className="users-row-action"
                       >
                         Edit
                       </button>
@@ -241,8 +241,8 @@ export default function UsersPage() {
                         onClick={() => handleDelete(user.id)}
                         className={`${
                           deleteConfirm === user.id
-                            ? "text-red-600 font-bold"
-                            : "text-red-600 hover:text-red-900"
+                            ? "users-row-action users-row-action--danger users-row-action--confirm"
+                            : "users-row-action users-row-action--danger"
                         }`}
                       >
                         {deleteConfirm === user.id ? "Confirm?" : "Delete"}
@@ -250,7 +250,7 @@ export default function UsersPage() {
                       {deleteConfirm === user.id && (
                         <button
                           onClick={() => setDeleteConfirm(null)}
-                          className="text-slate-600 hover:text-slate-900"
+                          className="users-row-action"
                         >
                           Cancel
                         </button>
@@ -273,8 +273,8 @@ export default function UsersPage() {
 
       {/* Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl">
+        <div className="users-modal-overlay fixed inset-0 flex items-center justify-center z-50">
+          <div className="users-modal-content rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Edit User</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>

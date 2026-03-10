@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { Task } from "@/db/schema";
+import ManagerSidebar from "@/components/ManagerSidebar";
 
 type Status = "todo" | "in_progress" | "done";
 type FilterStatus = Status | "all";
@@ -68,7 +69,7 @@ function UpdateTaskModal({ task, onClose, onUpdated }: { task: Task; onClose: ()
         <div className="flex gap-3">
           <button onClick={onClose} className="px-4 py-2.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-400 text-sm font-medium cursor-pointer hover:border-slate-500 transition-colors">Cancel</button>
           <button onClick={handleUpdate} disabled={loading || status === task.status}
-            className="flex-1 px-4 py-2.5 rounded-lg bg-indigo-500 text-white text-sm font-semibold cursor-pointer hover:bg-indigo-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            className="flex-1 px-4 py-2.5 rounded-lg bg-sky-600 text-white text-sm font-semibold cursor-pointer hover:bg-sky-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             {loading ? "Saving…" : "Save Changes"}
           </button>
         </div>
@@ -124,7 +125,7 @@ function TaskRow({ task, onUpdated, onDeleted }: { task: Task; onUpdated: (t: Ta
 
   return (
     <>
-      <div className="grid grid-cols-[1fr_130px_210px] items-center px-4 py-3 rounded-xl border border-transparent hover:bg-slate-800 hover:border-slate-700 gap-3 transition-all duration-150">
+      <div className="grid grid-cols-[1fr_130px_210px] items-center px-4 py-3 rounded-xl border border-slate-700/70 bg-slate-900/35 hover:bg-slate-800/65 hover:border-slate-600 gap-3 transition-all duration-150 shadow-sm">
         <div>
           <p className="font-semibold text-sm text-slate-100">{task.title}</p>
           {task.description && (
@@ -139,7 +140,7 @@ function TaskRow({ task, onUpdated, onDeleted }: { task: Task; onUpdated: (t: Ta
 
         <div className="flex gap-2 justify-end">
           <button onClick={() => setShowUpdate(true)}
-            className="px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-semibold cursor-pointer hover:bg-indigo-500/25 transition-colors">
+            className="px-3 py-1.5 rounded-lg bg-sky-500/12 border border-sky-400/35 text-sky-300 text-xs font-semibold cursor-pointer hover:bg-sky-500/22 transition-colors">
             Update Task
           </button>
           <button onClick={() => setShowDelete(true)}
@@ -167,11 +168,11 @@ function ProjectGroup({ projectId, tasks, onUpdated, onDeleted, onOpenProject }:
   const progress = Math.round((done / tasks.length) * 100);
 
   return (
-    <div className="bg-[#161d2b] border border-slate-800 rounded-2xl overflow-hidden mb-4">
+    <div className="alltasks-group bg-[#161d2b] border border-slate-800 rounded-2xl overflow-hidden mb-4">
       {/* Group header */}
       <div
         onClick={() => setCollapsed(c => !c)}
-        className="flex items-center justify-between px-5 py-4 cursor-pointer bg-[#1a2234] border-b border-slate-800"
+        className="alltasks-group-header flex items-center justify-between px-5 py-4 cursor-pointer bg-[#1a2234] border-b border-slate-800"
       >
         <div className="flex items-center gap-3">
           <span className="text-slate-400 text-sm">{collapsed ? "▶" : "▼"}</span>
@@ -184,14 +185,14 @@ function ProjectGroup({ projectId, tasks, onUpdated, onDeleted, onOpenProject }:
         <div className="flex items-center gap-3">
           <div className="w-20 h-1.5 bg-slate-700 rounded-full overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${progress === 100 ? "bg-green-400" : "bg-indigo-500"}`}
+              className={`h-full rounded-full transition-all duration-500 ${progress === 100 ? "bg-green-400" : "bg-sky-500"}`}
               style={{ width: `${progress}%` }}
             />
           </div>
           <span className="text-xs text-slate-500 min-w-[2rem]">{progress}%</span>
           <button
             onClick={e => { e.stopPropagation(); onOpenProject(projectId); }}
-            className="px-3 py-1.5 rounded-lg bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 text-xs font-medium cursor-pointer hover:bg-indigo-500/25 transition-colors"
+            className="alltasks-action-btn alltasks-action-btn--primary px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-colors"
           >
             Open Project →
           </button>
@@ -202,9 +203,9 @@ function ProjectGroup({ projectId, tasks, onUpdated, onDeleted, onOpenProject }:
       {!collapsed && (
         <div className="px-3 py-2">
           <div className="grid grid-cols-[1fr_130px_210px] px-4 py-2 gap-3">
-            <span className="text-xs text-slate-600 uppercase tracking-wider font-semibold">Task</span>
-            <span className="text-xs text-slate-600 uppercase tracking-wider font-semibold">Status</span>
-            <span className="text-xs text-slate-600 uppercase tracking-wider font-semibold text-right">Actions</span>
+            <span className="alltasks-th text-xs text-slate-600 uppercase tracking-wider font-semibold">Task</span>
+            <span className="alltasks-th text-xs text-slate-600 uppercase tracking-wider font-semibold">Status</span>
+            <span className="alltasks-th text-xs text-slate-600 uppercase tracking-wider font-semibold text-right">Actions</span>
           </div>
           {tasks.map(task => (
             <TaskRow key={task.id} task={task} onUpdated={onUpdated} onDeleted={onDeleted} />
@@ -219,8 +220,8 @@ function ProjectGroup({ projectId, tasks, onUpdated, onDeleted, onOpenProject }:
 
 function StatCard({ label, value, valueClass }: { label: string; value: number; valueClass: string }) {
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-xl px-5 py-4 flex-1 min-w-[120px]">
-      <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold">{label}</p>
+    <div className="alltasks-stat-card bg-slate-800 border border-slate-700 rounded-xl px-5 py-4 flex-1 min-w-[120px]">
+      <p className="alltasks-eyebrow text-xs text-slate-500 uppercase tracking-widest font-semibold">{label}</p>
       <p className={`text-4xl font-extrabold mt-1.5 ${valueClass}`}>{value}</p>
     </div>
   );
@@ -277,66 +278,70 @@ export default function AllTasksPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f1117] text-slate-200 p-10 font-sans">
-      <div className="max-w-4xl mx-auto">
+    <div className="alltasks-page flex min-h-screen flex-col text-slate-200 md:flex-row">
+      <ManagerSidebar />
 
-        {/* Header */}
-        <div className="mb-8">
-          <p className="text-xs tracking-[3px] text-slate-500 uppercase">Overview</p>
-          <h1 className="text-3xl font-bold text-slate-50 mt-1">All Tasks</h1>
-        </div>
+      <main className="flex flex-1 flex-col p-6 sm:p-8 lg:p-10">
+        <div className="kanban-shell alltasks-shell w-full">
 
-        {/* Stat cards */}
-        <div className="flex gap-3 mb-8 flex-wrap">
-          <StatCard label="Total"       value={counts.all}         valueClass="text-slate-50" />
-          <StatCard label="To Do"       value={counts.todo}        valueClass="text-slate-400" />
-          <StatCard label="In Progress" value={counts.in_progress} valueClass="text-amber-400" />
-          <StatCard label="Done"        value={counts.done}        valueClass="text-green-400" />
-        </div>
-
-        {/* Search + filters */}
-        <div className="flex gap-3 mb-6 flex-wrap items-center">
-          <input
-            placeholder="Search tasks or projects…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="bg-slate-800 border border-slate-700 rounded-lg text-slate-100 text-sm px-4 py-2.5 outline-none focus:border-indigo-500 transition-colors flex-1 min-w-[200px]"
-          />
-          {(["all", "todo", "in_progress", "done"] as const).map(f => (
-            <button key={f} onClick={() => setFilter(f)}
-              className={`px-4 py-1.5 rounded-full border text-xs font-medium cursor-pointer transition-all
-                ${filter === f
-                  ? "border-indigo-500 bg-indigo-500/15 text-indigo-400"
-                  : "border-slate-700 bg-transparent text-slate-500 hover:border-slate-600"}`}
-            >
-              {f === "all" ? "All" : STATUS_CONFIG[f as Status].label}
-            </button>
-          ))}
-        </div>
-
-        {/* Content */}
-        {loading ? (
-          <div className="text-center py-16 text-slate-500">Loading…</div>
-        ) : error ? (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-5 py-4 text-red-400 flex justify-between items-center">
-            <span>{error}</span>
-            <button onClick={fetchTasks} className="text-xs px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 cursor-pointer hover:border-slate-500">Retry</button>
+          {/* Header */}
+          <div className="mb-8">
+            <p className="kanban-eyebrow">Overview</p>
+            <h1 className="alltasks-title text-3xl font-bold text-slate-50 mt-1">All Tasks</h1>
           </div>
-        ) : Object.keys(grouped).length === 0 ? (
-          <div className="text-center py-16 text-slate-500">No tasks found.</div>
-        ) : (
-          Object.entries(grouped).map(([projectId, projectTasks]) => (
-            <ProjectGroup
-              key={projectId}
-              projectId={projectId}
-              tasks={projectTasks}
-              onUpdated={handleUpdated}
-              onDeleted={handleDeleted}
-              onOpenProject={id => router.push(`/projects/${id}/tasks`)}
+
+          {/* Stat cards */}
+          <div className="flex gap-3 mb-8 flex-wrap">
+            <StatCard label="Total"       value={counts.all}         valueClass="text-slate-50" />
+            <StatCard label="To Do"       value={counts.todo}        valueClass="text-slate-400" />
+            <StatCard label="In Progress" value={counts.in_progress} valueClass="text-amber-400" />
+            <StatCard label="Done"        value={counts.done}        valueClass="text-green-400" />
+          </div>
+
+          {/* Search + filters */}
+          <div className="flex gap-3 mb-6 flex-wrap items-center">
+            <input
+              placeholder="Search tasks or projects…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="alltasks-search bg-slate-800 border border-slate-700 rounded-lg text-slate-100 text-sm px-4 py-2.5 outline-none focus:border-sky-500 transition-colors flex-1 min-w-[200px]"
             />
-          ))
-        )}
-      </div>
+            {(["all", "todo", "in_progress", "done"] as const).map(f => (
+              <button key={f} onClick={() => setFilter(f)}
+                className={`alltasks-filter-btn px-4 py-1.5 rounded-full border text-xs font-medium cursor-pointer transition-all
+                  ${filter === f
+                    ? "border-sky-500 bg-sky-500/14 text-sky-300"
+                    : "border-slate-700 bg-transparent text-slate-500 hover:border-slate-600"}`}
+              >
+                {f === "all" ? "All" : STATUS_CONFIG[f as Status].label}
+              </button>
+            ))}
+          </div>
+
+          {/* Content */}
+          {loading ? (
+            <div className="text-center py-16 text-slate-500">Loading…</div>
+          ) : error ? (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-5 py-4 text-red-400 flex justify-between items-center">
+              <span>{error}</span>
+              <button onClick={fetchTasks} className="text-xs px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 cursor-pointer hover:border-slate-500">Retry</button>
+            </div>
+          ) : Object.keys(grouped).length === 0 ? (
+            <div className="text-center py-16 text-slate-500">No tasks found.</div>
+          ) : (
+            Object.entries(grouped).map(([projectId, projectTasks]) => (
+              <ProjectGroup
+                key={projectId}
+                projectId={projectId}
+                tasks={projectTasks}
+                onUpdated={handleUpdated}
+                onDeleted={handleDeleted}
+                onOpenProject={id => router.push(`/projects/${id}/tasks`)}
+              />
+            ))
+          )}
+        </div>
+      </main>
     </div>
   );
 }

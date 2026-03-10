@@ -178,12 +178,12 @@ export default function AnalyticsDashboard() {
   if (!stats) return null;
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 md:flex-row">
+    <div className="analytics-page flex min-h-screen flex-col md:flex-row">
       <ManagerSidebar />
 
-      <div className="flex flex-1 flex-col">
+      <div className="analytics-shell flex flex-1 flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-white border-b border-slate-200 shadow-sm">
+      <header className="analytics-header sticky top-0 z-10 bg-white border-b border-slate-200 shadow-sm">
         <div className="px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -194,21 +194,34 @@ export default function AnalyticsDashboard() {
               <button
                 onClick={fetchStats}
                 disabled={refreshing}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition text-sm font-medium"
+                className="analytics-action-btn analytics-action-btn--primary"
               >
-                {refreshing ? "Refreshing..." : "🔄 Refresh"}
+                <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden="true">
+                  <path d="M20 12A8 8 0 1 1 17.66 6.34" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  <path d="M20 4V9H15" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span>{refreshing ? "Refreshing..." : "Refresh"}</span>
               </button>
               <button
                 onClick={handleExportCSV}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
+                className="analytics-action-btn analytics-action-btn--success"
               >
-                📥 Export CSV
+                <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden="true">
+                  <path d="M12 4V14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  <path d="M8.5 10.5L12 14L15.5 10.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M5 19H19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+                <span>Export CSV</span>
               </button>
               <button
                 onClick={() => router.push("/dashboard/manager")}
-                className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition text-sm font-medium"
+                className="analytics-action-btn analytics-action-btn--neutral"
               >
-                ← Back
+                <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden="true">
+                  <path d="M19 12H5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  <path d="M10.5 6.5L5 12L10.5 17.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span>Back</span>
               </button>
             </div>
           </div>
@@ -217,55 +230,60 @@ export default function AnalyticsDashboard() {
 
       <main className="px-4 sm:px-6 lg:px-8 py-8">
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-lg transition">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="analytics-card bg-white rounded-lg border border-slate-200 p-6 hover:shadow-lg transition">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase text-slate-500">Total Users</p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">{stats.summary.totalUsers}</p>
                 <p className="text-xs text-slate-600 mt-1">Active in system</p>
               </div>
-              <div className="p-3 bg-blue-100 rounded-lg">👥</div>
+              <div className="analytics-kpi-icon text-cyan-300">
+                <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
+                  <circle cx="9" cy="8" r="3" stroke="currentColor" strokeWidth="1.8" />
+                  <path d="M3.5 19C3.5 15.96 5.96 13.5 9 13.5C12.04 13.5 14.5 15.96 14.5 19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  <circle cx="17" cy="9" r="2" stroke="currentColor" strokeWidth="1.8" />
+                  <path d="M15.5 14.7C16 14.56 16.51 14.5 17 14.5C19.49 14.5 21.5 16.51 21.5 19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+              </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-lg transition">
+          <div className="analytics-card bg-white rounded-lg border border-slate-200 p-6 hover:shadow-lg transition">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase text-slate-500">Total Projects</p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">{stats.summary.totalProjects}</p>
                 <p className="text-xs text-slate-600 mt-1">Across organization</p>
               </div>
-              <div className="p-3 bg-green-100 rounded-lg">📁</div>
+              <div className="analytics-kpi-icon text-emerald-300">
+                <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
+                  <path d="M3 7A2 2 0 0 1 5 5H9L11 7H19A2 2 0 0 1 21 9V17A2 2 0 0 1 19 19H5A2 2 0 0 1 3 17V7Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-lg transition">
+          <div className="analytics-card bg-white rounded-lg border border-slate-200 p-6 hover:shadow-lg transition">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase text-slate-500">Total Tasks</p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">{stats.summary.totalTasks}</p>
                 <p className="text-xs text-slate-600 mt-1">{completionRate}% completed</p>
               </div>
-              <div className="p-3 bg-purple-100 rounded-lg">✓</div>
+              <div className="analytics-kpi-icon text-violet-300">
+                <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
+                  <path d="M5 13L9.5 17.5L19 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-lg transition">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase text-slate-500">Overdue Tasks</p>
-                <p className="text-3xl font-bold text-red-600 mt-2">{stats.summary.overdueTasks}</p>
-                <p className="text-xs text-slate-600 mt-1">Require attention</p>
-              </div>
-              <div className="p-3 bg-red-100 rounded-lg">⚠️</div>
-            </div>
-          </div>
         </div>
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white rounded-lg border border-slate-200 p-6">
+          <div className="analytics-panel bg-white rounded-lg border border-slate-200 p-6">
             <h3 className="text-lg font-semibold text-slate-900 mb-4">Project Status Distribution</h3>
             <ResponsiveContainer width="100%" height={280}>
               <PieChart>
@@ -289,7 +307,7 @@ export default function AnalyticsDashboard() {
             </ResponsiveContainer>
           </div>
 
-          <div className="bg-white rounded-lg border border-slate-200 p-6">
+          <div className="analytics-panel bg-white rounded-lg border border-slate-200 p-6">
             <h3 className="text-lg font-semibold text-slate-900 mb-4">Task Status Breakdown</h3>
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={stats.taskStatusStats}>
@@ -306,31 +324,48 @@ export default function AnalyticsDashboard() {
 
         {/* Team Performance */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white rounded-lg border border-slate-200 p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Task Priority Distribution</h3>
-            <ResponsiveContainer width="100%" height={280}>
-              <PieChart>
-                <Pie
-                  data={stats.taskPriorityStats}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={(entry: any) => `${entry.priority}: ${entry.count}`}
-                  outerRadius={90}
-                  fill="#8884d8"
-                  dataKey="count"
-                  nameKey="priority"
-                >
-                  {stats.taskPriorityStats.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS.priority[entry.priority as keyof typeof COLORS.priority] || COLORS.primary[index % COLORS.primary.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+          <div className="analytics-panel bg-white rounded-lg border border-slate-200 p-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Task Completion by Project</h3>
+            {stats.taskCompletionByProject.length > 0 ? (
+              <ResponsiveContainer width="100%" height={280}>
+                <LineChart data={stats.taskCompletionByProject}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis
+                    dataKey="projectName"
+                    tick={{ fontSize: 11 }}
+                    tickFormatter={(value: string) =>
+                      value.length > 12 ? `${value.slice(0, 12)}...` : value
+                    }
+                  />
+                  <YAxis domain={[0, 100]} />
+                  <Tooltip
+                    contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
+                    formatter={(value: number, name: string) =>
+                      name === "Completion Rate"
+                        ? [`${value}%`, name]
+                        : [value, name]
+                    }
+                  />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="completionRate"
+                    name="Completion Rate"
+                    stroke="#22c55e"
+                    strokeWidth={2.5}
+                    dot={{ r: 3 }}
+                    activeDot={{ r: 5 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-70 flex items-center justify-center text-sm text-slate-500">
+                No completion data available.
+              </div>
+            )}
           </div>
 
-          <div className="bg-white rounded-lg border border-slate-200 p-6">
+          <div className="analytics-panel bg-white rounded-lg border border-slate-200 p-6">
             <h3 className="text-lg font-semibold text-slate-900 mb-4">User Distribution by Role</h3>
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={stats.userStats}>
@@ -346,7 +381,7 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Team Performance Section */}
-        <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
+        <div className="analytics-panel bg-white rounded-lg border border-slate-200 p-6 mb-8">
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Team Task Performance</h3>
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -383,7 +418,7 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Projects Section with Search */}
-        <div className="bg-white rounded-lg border border-slate-200 p-6">
+        <div className="analytics-panel bg-white rounded-lg border border-slate-200 p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <h3 className="text-lg font-semibold text-slate-900">Recent Projects</h3>
             <input
