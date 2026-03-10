@@ -8,10 +8,11 @@ import { EditProjectModal } from './EditProjectModal';
 
 interface ProjectCardProps {
   project: Project;
-  progress?: number; 
+  progress?: number;
+  managerName?: string;
 }
 
-export function ProjectCard({ project, progress = 0 }: ProjectCardProps) {
+export function ProjectCard({ project, progress = 0, managerName = "Unknown" }: ProjectCardProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
 
@@ -77,7 +78,7 @@ export function ProjectCard({ project, progress = 0 }: ProjectCardProps) {
           </div>
           <div className="projects-meta-item">
             <User size={14} className="mr-2" />
-            <span>Manager ID: {project.managerId}</span>
+            <span>Manager: {managerName}</span>
           </div>
         </div>
 

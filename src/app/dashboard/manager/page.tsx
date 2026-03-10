@@ -41,6 +41,7 @@ export default async function ManagerHomePage() {
             email={session.email}
             role={session.role}
             initials={initials}
+            theme="dark"
           />
         </div>
       </header>

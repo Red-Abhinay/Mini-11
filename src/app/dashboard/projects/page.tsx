@@ -1,11 +1,12 @@
 import { db } from "@/lib/db";
-import { projects } from "@/db/schema";
+import { projects, tasks, users } from "@/db/schema";
 import { ProjectCard } from "@/components/projects/ProjectCard";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { getSessionUser } from "@/lib/auth";
 import { Project } from "@/db/schema";
 import { CreateProjectModal } from "@/components/projects/CreateProjectModal";
 import { redirect } from "next/navigation";
+import ManagerSidebar from "@/components/ManagerSidebar";
 
 export default async function ProjectsPage() {
   const session = await getSessionUser();
@@ -22,34 +23,105 @@ export default async function ProjectsPage() {
     .from(projects)
     .where(eq(projects.managerId, session.userId));
 
-  return (
-    <div className="projects-page">
-      <div className="kanban-shell projects-shell">
-        <header className="kanban-header">
-          <div>
-            <p className="kanban-eyebrow">Portfolio view</p>
-            <h1>Your Projects</h1>
-            <p className="kanban-subtitle">
-              Track project health, ownership, and progress at a glance.
-            </p>
-          </div>
-          <div className="kanban-controls">
-            <CreateProjectModal />
-          </div>
-        </header>
+  const managerRows = await db
+    .select({ name: users.name })
+    .from(users)
+    .where(eq(users.id, session.userId))
+    .limit(1);
 
-        {allProjects.length === 0 ? (
-          <div className="projects-empty">
-            No projects yet. Create your first project to get started.
+  const managerName =
+    managerRows[0]?.name ||
+    session.email.split("@")[0].replace(/\./g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+
+  const progressByProject = new Map<string, number>();
+  const statusByProject = new Map<string, "planning" | "in_progress" | "completed">();
+  if (allProjects.length > 0) {
+    const projectIds = allProjects.map((project) => project.id);
+    const projectTasks = await db
+      .select({ projectId: tasks.projectId, status: tasks.status })
+      .from(tasks)
+      .where(inArray(tasks.projectId, projectIds));
+
+    const taskStats = new Map<
+      string,
+      { total: number; done: number; inProgress: number }
+    >();
+    for (const projectId of projectIds) {
+      taskStats.set(projectId, { total: 0, done: 0, inProgress: 0 });
+    }
+
+    for (const task of projectTasks) {
+      const current = taskStats.get(task.projectId) || { total: 0, done: 0, inProgress: 0 };
+      current.total += 1;
+      if (task.status === "done") {
+        current.done += 1;
+      }
+      if (task.status === "in_progress") {
+        current.inProgress += 1;
+      }
+      taskStats.set(task.projectId, current);
+    }
+
+    for (const [projectId, stats] of taskStats.entries()) {
+      // Count in-progress tasks as partial completion so active projects don't look stuck at 0%.
+      const completion =
+        stats.total > 0
+          ? Math.round(((stats.done + stats.inProgress * 0.5) / stats.total) * 100)
+          : 0;
+      progressByProject.set(projectId, completion);
+
+      const derivedStatus: "planning" | "in_progress" | "completed" =
+        stats.total === 0
+          ? "planning"
+          : stats.done === stats.total
+          ? "completed"
+          : stats.inProgress > 0 || stats.done > 0
+          ? "in_progress"
+          : "planning";
+
+      statusByProject.set(projectId, derivedStatus);
+    }
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col md:flex-row">
+      <ManagerSidebar />
+
+      <main className="flex flex-1 flex-col">
+        <div className="projects-page">
+          <div className="kanban-shell projects-shell">
+            <header className="kanban-header">
+              <div>
+                <p className="kanban-eyebrow">Portfolio view</p>
+                <h1>Your Projects</h1>
+                <p className="kanban-subtitle">
+                  Track project health, ownership, and progress at a glance.
+                </p>
+              </div>
+              <div className="kanban-controls">
+                <CreateProjectModal />
+              </div>
+            </header>
+
+            {allProjects.length === 0 ? (
+              <div className="projects-empty">
+                No projects yet. Create your first project to get started.
+              </div>
+            ) : (
+              <div className="projects-grid">
+                {allProjects.map((project: Project) => (
+                  <ProjectCard
+                    key={project.id}
+                    project={{ ...project, status: statusByProject.get(project.id) ?? project.status }}
+                    managerName={managerName}
+                    progress={progressByProject.get(project.id) ?? 0}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="projects-grid">
-            {allProjects.map((project: Project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))}
-          </div>
-        )}
-      </div>
+        </div>
+      </main>
     </div>
   );
 }

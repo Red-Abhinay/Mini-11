@@ -20,22 +20,48 @@ body {
 }
 
 .app-theme {
-  background: radial-gradient(1200px 600px at 10% -10%, #ffddb2 0%, rgba(255, 221, 178, 0) 60%),
+  --kanban-bg-base: #0f1216;
+  --kanban-bg-elevated: rgba(15, 18, 22, 0.72);
+  --kanban-bg-elevated-strong: rgba(15, 18, 22, 0.84);
+  --kanban-bg-hover: rgba(28, 34, 43, 0.78);
+  --kanban-text-primary: #f4f6f8;
+  --kanban-text-secondary: #d6dde5;
+  --kanban-text-muted: rgba(214, 221, 229, 0.82);
+  --kanban-border: rgba(255, 255, 255, 0.14);
+  --kanban-border-soft: rgba(255, 255, 255, 0.1);
+  --kanban-shadow: 0 20px 45px rgba(0, 0, 0, 0.26);
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #ffddb2 0%, rgba(255, 221, 178, 0) 60%),
     radial-gradient(900px 600px at 100% 0%, #b7e4ff 0%, rgba(183, 228, 255, 0) 60%),
-    #0f1216;
-  color: #f4f6f8;
+    var(--kanban-bg-base);
+  color: var(--kanban-text-primary);
 }
 
 .app-theme .bg-white,
 .app-theme .bg-slate-50,
 .app-theme .bg-slate-100,
 .app-theme .bg-slate-200 {
-  background-color: rgba(15, 18, 22, 0.72) !important;
-  color: #f4f6f8;
+  background-color: var(--kanban-bg-elevated) !important;
+  color: var(--kanban-text-primary);
 }
 
 .app-theme .bg-white\/95 {
-  background-color: rgba(15, 18, 22, 0.82) !important;
+  background-color: var(--kanban-bg-elevated-strong) !important;
+}
+
+.app-theme .bg-slate-900,
+.app-theme .bg-slate-800,
+.app-theme .bg-slate-700 {
+  background-color: rgba(10, 14, 20, 0.88) !important;
+}
+
+.app-theme .from-white,
+.app-theme .to-white,
+.app-theme .via-white,
+.app-theme .from-slate-50,
+.app-theme .to-slate-50 {
+  --tw-gradient-from: var(--kanban-bg-elevated) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgba(15, 18, 22, 0.2) var(--tw-gradient-to-position) !important;
 }
 
 .app-theme .text-slate-900,
@@ -44,32 +70,100 @@ body {
 .app-theme .text-slate-600,
 .app-theme .text-slate-500,
 .app-theme .text-slate-400 {
-  color: #d6dde5 !important;
+  color: var(--kanban-text-secondary) !important;
+}
+
+.app-theme .text-black,
+.app-theme .text-gray-900,
+.app-theme .text-gray-800,
+.app-theme .text-zinc-900 {
+  color: var(--kanban-text-primary) !important;
 }
 
 .app-theme .border-slate-100,
 .app-theme .border-slate-200,
 .app-theme .border-slate-300,
 .app-theme .border-slate-400 {
-  border-color: rgba(255, 255, 255, 0.14) !important;
+  border-color: var(--kanban-border) !important;
+}
+
+.app-theme .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+.app-theme .divide-slate-200 > :not([hidden]) ~ :not([hidden]),
+.app-theme .divide-slate-300 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--kanban-border-soft) !important;
 }
 
 .app-theme .shadow-sm,
 .app-theme .shadow,
 .app-theme .shadow-md,
 .app-theme .shadow-lg {
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.26) !important;
+  box-shadow: var(--kanban-shadow) !important;
+}
+
+.app-theme .shadow-xl,
+.app-theme .shadow-2xl {
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4) !important;
 }
 
 .app-theme .hover\:bg-slate-50:hover,
 .app-theme .hover\:bg-slate-100:hover,
 .app-theme .hover\:bg-white:hover {
-  background-color: rgba(28, 34, 43, 0.78) !important;
+  background-color: var(--kanban-bg-hover) !important;
 }
 
-.app-theme .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
-.app-theme .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
-  border-color: rgba(255, 255, 255, 0.1) !important;
+.app-theme .hover\:text-slate-900:hover,
+.app-theme .hover\:text-black:hover {
+  color: var(--kanban-text-primary) !important;
+}
+
+.app-theme .bg-indigo-50,
+.app-theme .bg-indigo-100,
+.app-theme .bg-blue-50,
+.app-theme .bg-blue-100 {
+  background-color: rgba(183, 228, 255, 0.14) !important;
+  border-color: rgba(183, 228, 255, 0.3) !important;
+}
+
+.app-theme .text-indigo-600,
+.app-theme .text-indigo-700,
+.app-theme .text-blue-600,
+.app-theme .text-blue-700 {
+  color: rgba(183, 228, 255, 0.95) !important;
+}
+
+.app-theme input,
+.app-theme textarea,
+.app-theme select {
+  background-color: rgba(15, 18, 22, 0.82);
+  color: var(--kanban-text-primary);
+  border-color: var(--kanban-border);
+}
+
+.app-theme input::placeholder,
+.app-theme textarea::placeholder {
+  color: rgba(214, 221, 229, 0.55);
+}
+
+.app-theme input:focus,
+.app-theme textarea:focus,
+.app-theme select:focus {
+  border-color: rgba(183, 228, 255, 0.45);
+  box-shadow: 0 0 0 2px rgba(183, 228, 255, 0.16);
+}
+
+.app-theme table thead,
+.app-theme thead.bg-slate-50,
+.app-theme thead.bg-white {
+  background-color: rgba(20, 25, 32, 0.92) !important;
+}
+
+.app-theme tbody tr:hover {
+  background-color: rgba(26, 34, 44, 0.65) !important;
+}
+
+.app-theme .modal-overlay,
+.app-theme [role="dialog"] {
+  backdrop-filter: blur(5px);
 }
 
 .kanban-page {
@@ -275,6 +369,334 @@ body {
   transition: background 0.2s ease;
 }
 
+.analytics-page {
+  background: radial-gradient(1200px 600px at 10% -10%, #ffddb2 0%, rgba(255, 221, 178, 0) 60%),
+    radial-gradient(900px 600px at 100% 0%, #b7e4ff 0%, rgba(183, 228, 255, 0) 60%),
+    #0f1216;
+}
+
+.analytics-shell {
+  backdrop-filter: blur(4px);
+}
+
+.analytics-header {
+  background: rgba(12, 17, 24, 0.82) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.analytics-card,
+.analytics-panel {
+  background: rgba(15, 18, 22, 0.72) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.26);
+}
+
+.analytics-card:hover {
+  background: rgba(20, 26, 35, 0.84) !important;
+  border-color: rgba(183, 228, 255, 0.28) !important;
+}
+
+.analytics-kpi-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  flex-shrink: 0;
+}
+
+.analytics-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(15, 18, 22, 0.66);
+  color: #d6dde5;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: all 0.18s ease;
+}
+
+.analytics-action-btn:hover {
+  background: rgba(22, 28, 37, 0.88);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #f4f6f8;
+}
+
+.analytics-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.analytics-action-btn--primary {
+  border-color: rgba(183, 228, 255, 0.4);
+  color: #d6e8f3;
+  background: rgba(183, 228, 255, 0.14);
+}
+
+.analytics-action-btn--primary:hover {
+  border-color: rgba(183, 228, 255, 0.58);
+  background: rgba(183, 228, 255, 0.2);
+}
+
+.analytics-action-btn--success {
+  border-color: rgba(217, 194, 164, 0.45);
+  color: #e6d6c2;
+  background: rgba(217, 194, 164, 0.14);
+}
+
+.analytics-action-btn--success:hover {
+  border-color: rgba(217, 194, 164, 0.62);
+  background: rgba(217, 194, 164, 0.2);
+}
+
+.analytics-action-btn--neutral {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #d6dde5;
+  background: rgba(15, 18, 22, 0.7);
+}
+
+.users-page {
+  background: radial-gradient(1200px 600px at 10% -10%, #ffddb2 0%, rgba(255, 221, 178, 0) 60%),
+    radial-gradient(900px 600px at 100% 0%, #b7e4ff 0%, rgba(183, 228, 255, 0) 60%),
+    #0f1216;
+}
+
+.users-shell {
+  backdrop-filter: blur(4px);
+}
+
+.users-header {
+  background: rgba(12, 17, 24, 0.82) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.users-panel {
+  background: rgba(15, 18, 22, 0.72) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.26);
+}
+
+.users-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(15, 18, 22, 0.66);
+  color: #d6dde5;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: all 0.18s ease;
+}
+
+.users-action-btn:hover {
+  background: rgba(22, 28, 37, 0.88);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #f4f6f8;
+}
+
+.users-action-btn--primary {
+  border-color: rgba(96, 165, 250, 0.5);
+  color: #bae6fd;
+  background: rgba(59, 130, 246, 0.18);
+}
+
+.users-action-btn--primary:hover {
+  border-color: rgba(147, 197, 253, 0.72);
+  background: rgba(59, 130, 246, 0.26);
+}
+
+.users-modal-overlay {
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(5px);
+}
+
+.users-modal-content {
+  background: rgba(15, 18, 22, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.users-role-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.18rem 0.62rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+}
+
+.users-role-badge--manager {
+  color: #c4b5fd;
+  border-color: rgba(196, 181, 253, 0.36);
+  background: rgba(139, 92, 246, 0.12);
+}
+
+.users-role-badge--employee {
+  color: #a7f3d0;
+  border-color: rgba(167, 243, 208, 0.34);
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.users-row-action {
+  color: #9ec5da;
+  background: transparent;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0;
+  transition: color 0.18s ease;
+}
+
+.users-row-action:hover {
+  color: #d6e8f3;
+}
+
+.users-row-action--danger {
+  color: #fda4af;
+}
+
+.users-row-action--danger:hover {
+  color: #fecdd3;
+}
+
+.users-row-action--confirm {
+  font-weight: 700;
+}
+
+.users-project-chip {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 0.2rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.4;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.users-project-chip--managed {
+  color: #d8b4fe;
+  background: rgba(147, 51, 234, 0.14);
+  border-color: rgba(216, 180, 254, 0.28);
+}
+
+.users-project-chip--assigned {
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.14);
+  border-color: rgba(147, 197, 253, 0.28);
+}
+
+.users-project-chip--empty {
+  color: #aeb8c5;
+  background: rgba(148, 163, 184, 0.08);
+  border-color: rgba(148, 163, 184, 0.24);
+}
+
+.users-project-chip-status {
+  font-weight: 500;
+}
+
+.users-project-chip-status--active {
+  color: #86efac;
+}
+
+.users-project-chip-status--inactive {
+  color: #aeb8c5;
+}
+
+.users-with-projects-shell {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.users-with-projects-header {
+  padding: 4px 2px;
+}
+
+.users-with-projects-label,
+.users-with-projects-th {
+  font-family: "IBM Plex Mono", "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+}
+
+.alltasks-page {
+  background: radial-gradient(1200px 600px at 10% -10%, #ffddb2 0%, rgba(255, 221, 178, 0) 60%),
+    radial-gradient(900px 600px at 100% 0%, #b7e4ff 0%, rgba(183, 228, 255, 0) 60%),
+    #0f1216;
+}
+
+.alltasks-shell {
+  max-width: 100%;
+  background: rgba(8, 12, 18, 0.58);
+}
+
+.alltasks-title {
+  letter-spacing: -0.02em;
+}
+
+.alltasks-eyebrow,
+.alltasks-th {
+  font-family: "IBM Plex Mono", "Space Grotesk", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+}
+
+.alltasks-stat-card {
+  background: rgba(10, 14, 22, 0.78);
+  border-color: rgba(183, 228, 255, 0.24);
+}
+
+.alltasks-search {
+  background: rgba(10, 14, 22, 0.84);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.alltasks-filter-btn {
+  font-family: "IBM Plex Mono", "Space Grotesk", sans-serif;
+}
+
+.alltasks-group {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(12, 18, 28, 0.76);
+}
+
+.alltasks-group-header {
+  background: rgba(24, 33, 53, 0.78);
+}
+
+.alltasks-action-btn {
+  border: 1px solid rgba(147, 197, 253, 0.35);
+  background: rgba(56, 189, 248, 0.14);
+  color: #bae6fd;
+}
+
+.alltasks-action-btn:hover {
+  background: rgba(56, 189, 248, 0.22);
+}
+
+.alltasks-action-btn--primary {
+  border-color: rgba(125, 211, 252, 0.4);
+}
+
 @media (max-width: 720px) {
   .kanban-page {
     padding: 24px 16px 48px;
@@ -287,6 +709,10 @@ body {
   .kanban-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .analytics-page {
+    padding-bottom: 24px;
   }
 }
 

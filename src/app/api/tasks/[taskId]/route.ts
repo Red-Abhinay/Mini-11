@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { tasks } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
+import { syncProjectStatusFromTasks } from "@/lib/project-status";
 
 
 export async function GET(req: NextRequest) {
@@ -106,6 +107,10 @@ export async function PATCH(
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
 
+    if (status !== undefined) {
+      await syncProjectStatusFromTasks(updated.projectId);
+    }
+
     return NextResponse.json(updated, { status: 200 });
   } catch (error) {
     console.error("[PATCH /api/tasks/:taskId]", error);
@@ -133,6 +138,8 @@ export async function DELETE(
     if (!deleted) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
+
+    await syncProjectStatusFromTasks(deleted.projectId);
 
     return NextResponse.json({ success: true, id: taskId }, { status: 200 });
   } catch (error) {

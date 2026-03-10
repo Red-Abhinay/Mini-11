@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { neon } from "@neondatabase/serverless";
+import { syncProjectStatusFromTasks } from "@/lib/project-status";
  
  
 export async function GET(req: NextRequest) {
@@ -107,6 +108,8 @@ export async function POST(req: NextRequest) {
         assignedTo: assigned_to ?? null, 
       })
       .returning();
+
+    await syncProjectStatusFromTasks(projectId);
  
     return NextResponse.json(newTask, { status: 201 });
   } catch (error) {
@@ -142,6 +145,8 @@ export async function PATCH(
     if (!updated) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
+
+    await syncProjectStatusFromTasks(updated.projectId);
  
     return NextResponse.json(updated, { status: 200 });
   } catch (error) {
@@ -170,6 +175,8 @@ export async function DELETE(
     if (!deleted) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
+
+    await syncProjectStatusFromTasks(deleted.projectId);
  
     return NextResponse.json({ success: true, id: taskId }, { status: 200 });
   } catch (error) {

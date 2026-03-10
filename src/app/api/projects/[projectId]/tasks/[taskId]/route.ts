@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { tasks } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
+import { syncProjectStatusFromTasks } from "@/lib/project-status";
 
 export async function GET(
   req: Request,
@@ -25,7 +26,7 @@ export async function PUT(
   req: Request,
   { params }: { params: Promise<{ projectId: string; taskId: string }> }
 ) {
-  const { taskId } = await params;
+  const { projectId, taskId } = await params;
   const body = await req.json();
 
   await db
@@ -37,6 +38,8 @@ export async function PUT(
     })
     .where(eq(tasks.id, taskId));
 
+  await syncProjectStatusFromTasks(projectId);
+
   return NextResponse.json({ success: true });
 }
 
@@ -44,9 +47,11 @@ export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ projectId: string; taskId: string }> }
 ) {
-  const { taskId } = await params;
+  const { projectId, taskId } = await params;
 
   await db.delete(tasks).where(eq(tasks.id, taskId));
+
+  await syncProjectStatusFromTasks(projectId);
 
   return NextResponse.json({ success: true });
 }
