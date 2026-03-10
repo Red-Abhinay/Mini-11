@@ -62,7 +62,8 @@ jobs:
           echo "image_uri=$IMAGE_URI" >> "$GITHUB_OUTPUT"
 
       - name: Image build summary
-        run: echo "✅ Image built and pushed: ${{ steps.image.outputs.image_uri }}"
+        run: |
+          echo "Image built and pushed: ${{ steps.image.outputs.image_uri }}"
 
   deploy:
     name: Deploy to EC2
@@ -98,7 +99,7 @@ jobs:
           script: |
             set -euo pipefail
             
-            echo "🚀 Starting deployment of ${{ needs.ci.outputs.image_uri }}"
+            echo "Starting deployment of ${{ needs.ci.outputs.image_uri }}"
             
             # Authenticate with ECR
             aws ecr get-login-password --region ${{ env.AWS_REGION }} | \
@@ -124,17 +125,17 @@ jobs:
             # Cleanup old images
             docker image prune -af --filter "until=168h"
             
-            echo "✅ Container deployed successfully"
+            echo "Container deployed successfully"
             docker ps --filter "name=${{ env.APP_NAME }}"
 
       - name: Health check
         run: |
-          echo "⏳ Waiting for application to be healthy..."
+          echo "Waiting for application to be healthy..."
           max_attempts=30
           attempt=1
           while [ $attempt -le $max_attempts ]; do
             if curl -sf http://${{ secrets.EC2_HOST }}:${{ env.APP_PORT }}/login > /dev/null 2>&1; then
-              echo "✅ Application is healthy"
+              echo "Application is healthy"
               exit 0
             fi
             echo "Attempt $attempt/$max_attempts: Application not ready yet..."
