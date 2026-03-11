@@ -87,12 +87,29 @@ jobs:
           # Using GitHub secret for EC2 host
           echo "ec2_host=${{ secrets.EC2_HOST }}" >> "$GITHUB_OUTPUT"
 
+      - name: Wait for EC2 SSH to be ready
+        run: |
+          echo "Waiting for EC2 SSH to be available..."
+          for i in $(seq 1 20); do
+            if nc -zw5 ${{ secrets.EC2_HOST }} 22 2>/dev/null; then
+              echo "SSH is ready after $i attempts"
+              exit 0
+            fi
+            echo "Attempt $i/20: SSH not ready, waiting 10s..."
+            sleep 10
+          done
+          echo "EC2 SSH not reachable after 200s"
+          exit 1
+
       - name: Deploy container on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          port: 22
+          timeout: 60s
+          command_timeout: 10m
           script_stop: true
           script: |
             set -euo pipefail
