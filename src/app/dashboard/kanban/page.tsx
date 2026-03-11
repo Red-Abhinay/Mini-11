@@ -181,8 +181,8 @@ const KanbanPageContent = () => {
           return "in_progress";
         case "completed":
           return "done";
-        case "reviewed":
-          return "done";
+        // case "reviewed":
+        //   return "done";
         default:
           return "todo";
       }

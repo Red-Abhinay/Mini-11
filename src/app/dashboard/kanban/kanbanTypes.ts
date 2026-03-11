@@ -2,7 +2,7 @@ export const columns = [
   { id: "assigned", title: "Assigned" },
   { id: "in-progress", title: "In Progress" },
   { id: "completed", title: "Completed" },
-  { id: "reviewed", title: "Reviewed" },
+  // { id: "reviewed", title: "Reviewed" },
 ] as const;
 
 export type TaskStatus = (typeof columns)[number]["id"];
