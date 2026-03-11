@@ -88,6 +88,9 @@ jobs:
           echo "ec2_host=${{ secrets.EC2_HOST }}" >> "$GITHUB_OUTPUT"
 
       - name: Deploy container on EC2 via SSM
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
           set -euo pipefail
 
@@ -109,6 +112,8 @@ jobs:
 
           IMAGE_URI="${{ needs.ci.outputs.image_uri }}"
           REGISTRY="${IMAGE_URI%%/*}"
+          DB_B64=$(printf '%s' "$DATABASE_URL" | tr -d '\r\n' | base64 -w0)
+          JWT_B64=$(printf '%s' "$JWT_SECRET" | tr -d '\r\n' | base64 -w0)
 
           cat > commands.json <<EOF
           {
@@ -118,6 +123,9 @@ jobs:
               "docker pull ${IMAGE_URI}",
               "docker stop ${{ env.APP_NAME }} || true",
               "docker rm ${{ env.APP_NAME }} || true",
+              "mkdir -p /etc/docker",
+              "echo DATABASE_URL=\$(echo ${DB_B64} | base64 -d) > /etc/docker/.env",
+              "echo JWT_SECRET=\$(echo ${JWT_B64} | base64 -d) >> /etc/docker/.env",
               "docker run -d --name ${{ env.APP_NAME }} --restart unless-stopped -p ${{ env.APP_PORT }}:3000 --env-file /etc/docker/.env -e NODE_ENV=production -e COOKIE_SECURE=false ${IMAGE_URI}",
               "docker image prune -af --filter until=168h",
               "docker ps --filter name=${{ env.APP_NAME }}"
