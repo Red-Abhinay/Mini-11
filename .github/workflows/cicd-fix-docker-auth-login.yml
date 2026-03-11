@@ -87,45 +87,70 @@ jobs:
           # Using GitHub secret for EC2 host
           echo "ec2_host=${{ secrets.EC2_HOST }}" >> "$GITHUB_OUTPUT"
 
-      - name: Deploy container on EC2
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          script_stop: true
-          script: |
-            set -euo pipefail
-            
-            echo "Starting deployment of ${{ needs.ci.outputs.image_uri }}"
-            
-            # Authenticate with ECR
-            aws ecr get-login-password --region ${{ env.AWS_REGION }} | \
-              docker login --username AWS --password-stdin $(echo "${{ needs.ci.outputs.image_uri }}" | cut -d'/' -f1)
-            
-            # Pull latest image
-            docker pull "${{ needs.ci.outputs.image_uri }}"
-            
-            # Stop and remove old container
-            docker stop ${{ env.APP_NAME }} || true
-            docker rm ${{ env.APP_NAME }} || true
-            
-            # Start new container with secrets from environment
-            docker run -d \
-              --name ${{ env.APP_NAME }} \
-              --restart unless-stopped \
-              -p ${{ env.APP_PORT }}:3000 \
-              -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
-              -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
-              -e NODE_ENV=production \
-              -e COOKIE_SECURE=false \
-              "${{ needs.ci.outputs.image_uri }}"
-            
-            # Cleanup old images
-            docker image prune -af --filter "until=168h"
-            
-            echo "Container deployed successfully"
-            docker ps --filter "name=${{ env.APP_NAME }}"
+      - name: Deploy container on EC2 via SSM
+        run: |
+          set -euo pipefail
+
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --region ${{ env.AWS_REGION }} \
+            --filters "Name=ip-address,Values=${{ secrets.EC2_HOST }}" "Name=instance-state-name,Values=running" \
+            --query "Reservations[0].Instances[0].InstanceId" \
+            --output text)
+
+          if [ -z "$INSTANCE_ID" ] || [ "$INSTANCE_ID" = "None" ]; then
+            echo "Could not resolve running EC2 instance from EC2_HOST secret"
+            exit 1
+          fi
+
+          IMAGE_URI="${{ needs.ci.outputs.image_uri }}"
+          REGISTRY="${IMAGE_URI%%/*}"
+
+          cat > commands.json <<EOF
+          {
+            "commands": [
+              "set -euo pipefail",
+              "aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${REGISTRY}",
+              "docker pull ${IMAGE_URI}",
+              "docker stop ${{ env.APP_NAME }} || true",
+              "docker rm ${{ env.APP_NAME }} || true",
+              "docker run -d --name ${{ env.APP_NAME }} --restart unless-stopped -p ${{ env.APP_PORT }}:3000 --env-file /etc/docker/.env -e NODE_ENV=production -e COOKIE_SECURE=false ${IMAGE_URI}",
+              "docker image prune -af --filter until=168h",
+              "docker ps --filter name=${{ env.APP_NAME }}"
+            ]
+          }
+          EOF
+
+          COMMAND_ID=$(aws ssm send-command \
+            --region ${{ env.AWS_REGION }} \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --parameters file://commands.json \
+            --query "Command.CommandId" \
+            --output text)
+
+          echo "SSM Command ID: $COMMAND_ID"
+
+          for i in $(seq 1 30); do
+            STATUS=$(aws ssm get-command-invocation \
+              --region ${{ env.AWS_REGION }} \
+              --command-id "$COMMAND_ID" \
+              --instance-id "$INSTANCE_ID" \
+              --query "Status" --output text 2>/dev/null || echo "Pending")
+            echo "Attempt $i/30: status=$STATUS"
+            if [ "$STATUS" = "Success" ]; then
+              echo "Deployment succeeded"
+              aws ssm get-command-invocation --region ${{ env.AWS_REGION }} --command-id "$COMMAND_ID" --instance-id "$INSTANCE_ID" --query "StandardOutputContent" --output text
+              exit 0
+            elif [ "$STATUS" = "Failed" ] || [ "$STATUS" = "TimedOut" ] || [ "$STATUS" = "Cancelled" ]; then
+              echo "Deployment failed"
+              aws ssm get-command-invocation --region ${{ env.AWS_REGION }} --command-id "$COMMAND_ID" --instance-id "$INSTANCE_ID" --query "StandardErrorContent" --output text
+              exit 1
+            fi
+            sleep 10
+          done
+
+          echo "Timed out waiting for SSM command"
+          exit 1
 
       - name: Health check
         run: |
