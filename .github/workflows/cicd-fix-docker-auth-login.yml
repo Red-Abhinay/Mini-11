@@ -91,14 +91,19 @@ jobs:
         run: |
           set -euo pipefail
 
-          INSTANCE_ID=$(aws ec2 describe-instances \
-            --region ${{ env.AWS_REGION }} \
-            --filters "Name=ip-address,Values=${{ secrets.EC2_HOST }}" "Name=instance-state-name,Values=running" \
-            --query "Reservations[0].Instances[0].InstanceId" \
-            --output text)
+          # Prefer stable instance-id secret; fall back to tag lookup.
+          INSTANCE_ID="${{ secrets.EC2_INSTANCE_ID }}"
+
+          if [ -z "$INSTANCE_ID" ]; then
+            INSTANCE_ID=$(aws ec2 describe-instances \
+              --region ${{ env.AWS_REGION }} \
+              --filters "Name=tag:Name,Values=${{ env.APP_NAME }}-instance" "Name=instance-state-name,Values=running" \
+              --query "Reservations[0].Instances[0].InstanceId" \
+              --output text)
+          fi
 
           if [ -z "$INSTANCE_ID" ] || [ "$INSTANCE_ID" = "None" ]; then
-            echo "Could not resolve running EC2 instance from EC2_HOST secret"
+            echo "Could not resolve running EC2 instance (set EC2_INSTANCE_ID secret or ensure Name tag '${{ env.APP_NAME }}-instance')"
             exit 1
           fi
 
