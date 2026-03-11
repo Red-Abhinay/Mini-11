@@ -1,9 +1,9 @@
-name: CI/CD - main
+name: CI/CD - fix/docker-auth-login
 
 on:
   push:
     branches:
-      - main
+      - fix/docker-auth-login
   workflow_dispatch:
 
 permissions:
